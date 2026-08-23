@@ -1,0 +1,17 @@
+# 이 저장소는 공개다. 올리기 전에 여기 목록을 한 번 본다.
+
+# 윈도우 · macOS 가 남기는 것
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# 편집기
+.vscode/
+.idea/
+*.swp
+
+# 혹시라도 옆에 두게 될 실제 데이터
+# (데스크톱 앱에서 뽑은 원본. 사업명과 업무 내용이 그대로 들어 있다)
+dashboard.json
+trips.json
+*.backup.json

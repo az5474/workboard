@@ -1,0 +1,335 @@
+/* ============================================================
+   업무보드 디자인 토큰
+   출처: DESIGN-meta.md (Meta 디자인 시스템 분석) 을 바탕으로,
+   매일 여는 업무 대시보드에 맞게 다시 정리했다.
+
+   방향 — 조용한 편집형 대시보드.
+   색은 사업을 구분하는 데만 쓴다. 나머지는 무채색과 위험 신호 하나로 간다.
+   위계는 글자 크기가 아니라 굵기와 여백으로 만든다.
+
+   서체는 Pretendard Variable. 가변 축이 있으니 굵기를 실제로 여러 단 쓴다.
+   (이전 버전은 제목부터 칩까지 전부 700 이라 화면이 시끄러웠다.)
+   ============================================================ */
+
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+
+:root {
+  /* ---------- 색: 브랜드 ---------- */
+  --primary:        #0064e0;   /* 되돌리기 어려운 확정 동작 */
+  --primary-deep:   #0457cb;
+  --primary-soft:   #4da3ff;   /* 어두운 바탕 위의 링크 (토스트 등) */
+  --on-primary:     #ffffff;
+
+  --ink-button:     #14171a;   /* 검정 알약 버튼. 순검정은 쓰지 않는다 */
+  --on-ink-button:  #ffffff;
+
+  /* ---------- 색: 표면 ---------- */
+  --canvas:         #ffffff;
+  --surface-soft:   #f2f4f6;
+  --surface-sunken: #e9ecef;   /* 눌린 상태 · 트랙 */
+  --hairline:       #d3d7dc;
+  --hairline-soft:  #e4e8ec;
+
+  /* ---------- 색: 글자 ---------- */
+  --ink-deep:       #0d1216;
+  --ink:            #1c1e21;
+  --charcoal:       #3f444b;
+  --slate:          #4b4c4f;
+  --steel:          #5c6570;
+  --stone:          #767e8a;
+  --disabled-text:  #b7bcc2;
+
+  /* ---------- 색: 의미 ---------- */
+  --success:        #1f8f3d;
+  --attention:      #b8791a;
+  --warning:        #f7b928;
+  --critical:       #d81b3c;
+  --critical-strong:#e8213f;
+
+  /* ---------- 업무 상태 (이 앱 고유) ----------
+     Meta 시스템에는 없는 값이라 의미색에서 파생시킨다.
+     우선순위는 빨강 계열로 긴급도를, 대기는 노랑 계열로
+     "내 손을 떠난 일" 임을 나타낸다. */
+  --priority-urgent:      var(--critical);
+  --priority-urgent-bg:   #fdeaed;
+  --priority-high:        #b3600b;
+  --priority-high-bg:     #fbf0e2;
+  --priority-high-ink:    #92500a;   /* 옅은 주황 바탕 위에 얹는 글자 */
+  --priority-normal:      var(--steel);
+  --priority-normal-bg:   var(--surface-soft);
+
+  --status-todo:          var(--steel);
+  --status-doing:         var(--primary);
+  --status-doing-bg:      #e7f0fd;
+  --status-doing-ink:     var(--primary-deep);
+  --status-wait:          var(--attention);
+  --status-wait-bg:       #faf1e0;
+  --status-wait-ink:      #8a5b0c;
+  --status-done:          var(--success);
+  --status-done-bg:       #e6f3ea;
+  --status-done-ink:      #1a7434;
+
+  --overdue:              var(--critical);
+  --overdue-ink:          #b3122e;   /* 옅은 빨강 바탕 위에 얹는 글자 */
+  --overdue-bg:           #fdeaed;
+  --overdue-line:         rgba(216, 27, 60, 0.32);
+
+  /* ---------- 사업 구분 색 ----------
+     같은 명도·채도 축에서 골라 열 가지 색이 한 가족처럼 보이게 했다.
+     이전 팔레트는 채도가 제각각이라 사업마다 무게가 달라 보였다.
+     여기 값은 '선택지' 일 뿐, 이미 저장된 사업 색은 그대로 둔다. */
+  --proj-1:  #ab4636;   /* 붉은흙 */
+  --proj-2:  #a96b33;   /* 주황 */
+  --proj-3:  #9a7f2e;   /* 호박 */
+  --proj-4:  #658f32;   /* 올리브 */
+  --proj-5:  #2e9a6e;   /* 초록 */
+  --proj-6:  #2f9c9a;   /* 청록 */
+  --proj-7:  #3c7fb0;   /* 하늘 */
+  --proj-8:  #4a5cb8;   /* 남색 */
+  --proj-9:  #7a45b5;   /* 보라 */
+  --proj-10: #a93b77;   /* 자홍 */
+
+  /* 사업 색은 DB 값이라 다크에서 바꿀 수 없다.
+     대신 색을 쓰는 자리(막대·점)에 이 보정을 걸어 어두운 바탕에서도 보이게 한다. */
+  --proj-adjust: none;
+
+  /* ---------- 서체 ---------- */
+  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+               system-ui, 'Segoe UI', 'Malgun Gothic', sans-serif;
+
+  /* 굵기 — 위계를 만드는 주 수단.
+     본문 400 / 부가정보 500 / 강조·버튼 600 / 제목·숫자 700 */
+  --fw-body:   400;
+  --fw-meta:   500;
+  --fw-semi:   600;
+  --fw-bold:   700;
+
+  --fs-heading-lg:  32px;
+  --fs-heading-sm:  22px;
+  --fs-subtitle:    17px;
+  --fs-body:        16px;
+  --fs-body-sm:     14px;
+  --fs-caption:     12px;
+  --fs-micro:       11px;
+
+  --lh-heading:   1.28;
+  --lh-body:      1.50;
+  --lh-body-sm:   1.45;
+  --lh-caption:   1.35;
+
+  /* 원본의 음수 자간. 한글에서는 과하면 답답해 보여 절반만 적용한다. */
+  --ls-body:      -0.08px;
+  --ls-body-sm:   -0.07px;
+  --ls-tight:     -0.3px;   /* 큰 제목과 큰 숫자에만 */
+
+  /* ---------- 모서리 ----------
+     규칙은 세 가지뿐이다. 이 밖의 값은 쓰지 않는다.
+       누르는 것(버튼·칩·배지·탭)  → --r-control (알약)
+       바깥 상자(카드·알림·빈 상태) → --r-card
+       상자 안의 것(행·입력·작은 면) → --r-row
+     이전 버전은 2·4·6·8·16·24·32·40px 이 뒤섞여 규칙이 없었다. */
+  --r-row:      10px;
+  --r-card:     16px;
+  --r-sheet:    20px;
+  --r-control:  100px;
+  --r-circle:   9999px;
+  --r-sm:        4px;   /* 스켈레톤 조각처럼 아주 작은 면 */
+
+  /* ---------- 간격 ---------- */
+  --sp-xxs:        4px;
+  --sp-xs:         8px;
+  --sp-sm:        10px;
+  --sp-md:        12px;
+  --sp-base:      16px;
+  --sp-lg:        20px;
+  --sp-xl:        24px;
+  --sp-xxl:       32px;
+  --sp-xxxl:      40px;
+
+  /* ---------- 그림자 ----------
+     대체로 평평하게 간다. 떠 있는 느낌은 진짜로 떠 있는 것(시트·토스트)에만. */
+  /* ---------- 토스트 ----------
+     토스트는 화면 밝기를 따라 뒤집히면 안 된다.
+     --ink-deep 를 쓰면 어두운 화면에서 판이 하얘지고 글자가 사라진다.
+     자기 색을 따로 갖는다. */
+  --toast-bg:      #0d1216;
+  --toast-ink:     #ffffff;
+  --toast-accent:  #8cc0ff;
+
+  /* ---------- 선택된 상태 버튼의 채움색 ----------
+     흰 글자를 얹는 자리라 어느 정도 어두워야 한다.
+     밝기 설정을 따라 뒤집히면 흰 글자가 사라지므로 한 벌만 쓴다. */
+  --fill-urgent: #c01230;
+  --fill-high:   #96520a;
+  --fill-doing:  #0a5bc4;
+  --fill-wait:   #8a5b0c;
+  --fill-done:   #1a7434;
+  --on-fill:     #ffffff;
+
+  --shadow-panel:  rgba(13, 18, 22, 0.10) 0px 1px 3px 0px;
+  --shadow-float:  rgba(13, 18, 22, 0.18) 0px 8px 28px -4px,
+                   rgba(13, 18, 22, 0.10) 0px 2px 8px -2px;
+  --focus-ring:    var(--primary);
+
+  /* ---------- 동작 ----------
+     기본 CSS 이징은 힘이 없다. 커브를 직접 준다.
+     ease-in 은 쓰지 않는다 — 시작이 늦어 굼떠 보인다. */
+  --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-sheet:  cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* 하루에 수십 번 하는 동작일수록 짧아야 한다.
+     체크·누름은 눈치채기 전에 끝나고, 시트처럼 가끔 여는 것만 여유를 준다. */
+  --dur-tap:    120ms;
+  --dur-ui:     180ms;
+  --dur-sheet:  260ms;
+
+  /* ---------- 레이아웃 ---------- */
+  --max-width:   1280px;
+  --read-width:  860px;   /* 한 줄로 늘어놓는 목록의 최대 폭 */
+  --tap-min:     44px;    /* 손가락으로 누를 수 있는 최소 크기 */
+}
+
+/* ============================================================
+   다크 모드
+   원본 문서에 정의가 없어 직접 만들었다.
+   판단 기준은 하나 — 밝을 때 눈에 띄던 것은 어두울 때도 눈에 띄어야 한다.
+   ============================================================ */
+
+/* 시스템 설정을 따를 때 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { color-scheme: dark; }
+}
+
+/* 값은 한 벌만 쓰고 두 선택자에서 함께 부른다 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --canvas:         #14171b;
+    --surface-soft:   #1e2228;
+    --surface-sunken: #272c33;
+    --hairline:       #363c44;
+    --hairline-soft:  #272c33;
+
+    --ink-deep:       #f3f5f8;
+    --ink:            #e3e6ea;
+    --charcoal:       #c8ced6;
+    --slate:          #aeb5be;
+    --steel:          #949ca6;
+    --stone:          #838d9a;
+    --disabled-text:  #4b525b;
+
+    --ink-button:     #f3f5f8;
+    --on-ink-button:  #14171b;
+
+    --primary:        #4d9bff;
+    --primary-deep:   #75b2ff;
+    --primary-soft:   #8cc0ff;
+    --on-primary:     #0b1220;
+
+    --success:        #4cc16a;
+    --attention:      #e0a13a;
+    --critical:       #ff5f77;
+    --critical-strong:#ff7386;
+
+    --priority-high:      #e09a4d;
+    --priority-urgent-bg: #3a1c22;
+    --priority-high-bg:   #362718;
+    --priority-normal-bg: #22262c;
+
+    --status-doing-bg:  #16273c;
+    --status-doing-ink: #8cc0ff;
+    --status-wait-bg:   #302716;
+    --status-wait-ink:  #e0a13a;
+    --status-done-bg:   #172c1e;
+    --status-done-ink:  #6bd087;
+
+    --overdue-ink:  var(--critical);
+    --overdue-bg:   #3a1c22;
+    --overdue-line: rgba(255, 95, 119, 0.38);
+    --priority-high-ink: var(--priority-high);
+
+    /* 어두운 화면에서 새까만 판은 배경에 묻힌다. 한 단 띄운다. */
+    --toast-bg:  #2b3138;
+    --toast-ink: #f3f5f8;
+
+    --shadow-panel: rgba(0, 0, 0, 0.4) 0px 1px 3px 0px;
+    --shadow-float: rgba(0, 0, 0, 0.55) 0px 8px 28px -4px,
+                    rgba(0, 0, 0, 0.35) 0px 2px 8px -2px;
+    --focus-ring:   #7ab4ff;
+
+    /* 사업 색은 저장된 값 그대로 오므로, 쓰는 자리에서 밝기를 올려준다 */
+    --proj-adjust: brightness(1.32) saturate(0.94);
+  }
+}
+
+/* 사용자가 직접 어둡게 고른 경우 */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --canvas:         #14171b;
+  --surface-soft:   #1e2228;
+  --surface-sunken: #272c33;
+  --hairline:       #363c44;
+  --hairline-soft:  #272c33;
+
+  --ink-deep:       #f3f5f8;
+  --ink:            #e3e6ea;
+  --charcoal:       #c8ced6;
+  --slate:          #aeb5be;
+  --steel:          #949ca6;
+  --stone:          #838d9a;
+  --disabled-text:  #4b525b;
+
+  --ink-button:     #f3f5f8;
+  --on-ink-button:  #14171b;
+
+  --primary:        #4d9bff;
+  --primary-deep:   #75b2ff;
+  --primary-soft:   #8cc0ff;
+  --on-primary:     #0b1220;
+
+  --success:        #4cc16a;
+  --attention:      #e0a13a;
+  --critical:       #ff5f77;
+  --critical-strong:#ff7386;
+
+  --priority-high:      #e09a4d;
+  --priority-urgent-bg: #3a1c22;
+  --priority-high-bg:   #362718;
+  --priority-normal-bg: #22262c;
+
+  --status-doing-bg:  #16273c;
+  --status-doing-ink: #8cc0ff;
+  --status-wait-bg:   #302716;
+  --status-wait-ink:  #e0a13a;
+  --status-done-bg:   #172c1e;
+  --status-done-ink:  #6bd087;
+
+  --overdue-ink:  var(--critical);
+  --overdue-bg:   #3a1c22;
+  --overdue-line: rgba(255, 95, 119, 0.38);
+  --priority-high-ink: var(--priority-high);
+
+  --toast-bg:  #2b3138;
+  --toast-ink: #f3f5f8;
+
+  --shadow-panel: rgba(0, 0, 0, 0.4) 0px 1px 3px 0px;
+  --shadow-float: rgba(0, 0, 0, 0.55) 0px 8px 28px -4px,
+                  rgba(0, 0, 0, 0.35) 0px 2px 8px -2px;
+  --focus-ring:   #7ab4ff;
+
+  --proj-adjust: brightness(1.32) saturate(0.94);
+}
+
+/* ============================================================
+   움직임을 줄여달라는 설정
+   시간 토큰을 0 으로 만들어 한 곳에서 끈다.
+   색과 투명도 변화는 남는다 — 그건 상태를 알려주는 정보다.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-tap:   0ms;
+    --dur-ui:    0ms;
+    --dur-sheet: 0ms;
+  }
+}

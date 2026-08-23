@@ -1,0 +1,231 @@
+/* ============================================================
+   출장 달력
+
+   핵심은 "며칠짜리인지" 다. 하루씩 끊어 점으로 찍으면
+   사흘 출장인지 하루 출장인지 눈으로 셀 수가 없다.
+   그래서 한 주 안에서는 막대 하나로 이어 그린다.
+   주를 넘어가는 출장은 양 끝을 각지게 만들어 "아직 안 끝났다" 를 표시한다.
+   ============================================================ */
+
+.cal-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-md);
+  flex-wrap: wrap;
+}
+.cal-month {
+  font-size: var(--fs-subtitle);
+  font-weight: var(--fw-bold);
+  color: var(--ink-deep);
+  letter-spacing: var(--ls-tight);
+  min-width: 118px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 격자 ---------- */
+.cal {
+  border: 1px solid var(--hairline-soft);
+  border-radius: var(--r-card);
+  overflow: hidden;
+  background: var(--canvas);
+
+  /* 칸 높이는 그 주에 막대가 몇 층 쌓였는지에 따라 정해진다.
+     JS 는 층수(--lanes)만 알려주고 계산은 여기서 한다. */
+  --num-h:    28px;   /* 날짜 숫자가 차지하는 윗줄 */
+  --lane-h:   21px;   /* 막대 한 층 */
+  --cell-min: 76px;   /* 출장이 없어도 이만큼은 비워둔다 */
+}
+
+.cal-dow {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  background: var(--surface-soft);
+}
+.cal-dow span {
+  padding: var(--sp-xs) 0;
+  text-align: center;
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-meta);
+  color: var(--steel);
+}
+/* 주말은 한 톤 낮춘다. 색을 더 쓰지 않고 요일을 구분하는 방법이다. */
+.cal-dow span:first-child { color: var(--critical); }
+.cal-dow span:last-child  { color: var(--status-doing-ink); }
+
+.cal-week { position: relative; }
+.cal-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.cal-day {
+  border-top: 1px solid var(--hairline-soft);
+  border-right: 1px solid var(--hairline-soft);
+  padding: 5px 6px 6px;
+  min-height: max(var(--cell-min), calc(var(--num-h) + var(--lanes, 0) * var(--lane-h) + 6px));
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dur-ui) var(--ease-out);
+}
+.cal-day:last-child { border-right: none; }
+.cal-week:first-child .cal-day { border-top: none; }
+@media (hover: hover) and (pointer: fine) {
+  .cal-day:hover { background: var(--surface-soft); }
+  .cal-day.is-outside:hover { background: var(--surface-sunken); }
+}
+.cal-day:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: -2px; }
+
+.cal-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 21px;
+  height: 21px;
+  padding: 0 5px;
+  border-radius: var(--r-circle);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-meta);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+/* 이번 달이 아닌 날.
+   글자를 흐리게 지우지 않는다 — 이 칸도 눌러서 출장을 넣을 수 있는 버튼이고,
+   월초·월말에 걸친 출장이 어디서 시작했는지 읽혀야 한다.
+   대신 바탕을 한 단 내려서 "이번 달이 아니다" 를 말한다. */
+.cal-day.is-outside { background: var(--surface-soft); }
+.cal-day.is-sun .cal-num { color: var(--critical); }
+.cal-day.is-sat .cal-num { color: var(--status-doing-ink); }
+.cal-day.is-outside .cal-num,
+.cal-day.is-outside.is-sun .cal-num,
+.cal-day.is-outside.is-sat .cal-num { color: var(--steel); font-weight: var(--fw-body); }
+
+.cal-day.is-today .cal-num {
+  background: var(--ink-button);
+  color: var(--on-ink-button);
+  font-weight: var(--fw-bold);
+}
+
+/* ---------- 기간 막대 ---------- */
+.cal-bars {
+  position: absolute;
+  left: 0; right: 0;
+  top: var(--num-h);
+  pointer-events: none;   /* 빈 곳을 누르면 아래 날짜 칸이 받는다 */
+}
+.cal-bar {
+  position: absolute;
+  top: calc(var(--lane) * var(--lane-h));
+  height: calc(var(--lane-h) - 3px);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 7px;
+  border: none;
+  border-radius: var(--r-control);
+  /* 사업 색을 그대로 깔면 흰 글자가 4.3 밖에 안 나온다 (기준 4.5).
+     한 톤 눌러서 얹는다. 색은 여전히 그 사업의 색으로 읽힌다.
+     다크 모드의 --proj-adjust 는 여기 걸지 않는다 — 넓은 면이라 밝힐 이유가 없고,
+     밝히면 흰 글자가 다시 묻힌다. */
+  background: color-mix(in srgb, var(--tcolor, var(--steel)) 86%, #000);
+  color: #fff;
+  font-family: inherit;
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-meta);
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background var(--dur-ui) var(--ease-out), transform var(--dur-tap) var(--ease-out);
+}
+.cal-bar:active { transform: scale(0.98); }
+@media (hover: hover) and (pointer: fine) {
+  .cal-bar:hover { background: var(--tcolor, var(--steel)); }
+}
+.cal-bar:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 1px; }
+
+/* 주를 넘어 이어지는 쪽은 각지게. 여기서 끝난 게 아니라는 표시다. */
+.cal-bar.cont-left  { border-top-left-radius: 2px;  border-bottom-left-radius: 2px; }
+.cal-bar.cont-right { border-top-right-radius: 2px; border-bottom-right-radius: 2px; }
+
+/* ---------- 시트의 기간 입력 ----------
+   시작과 끝을 나란히 둔다. 따로 떨어뜨리면 며칠짜리인지 감이 안 온다. */
+.trip-range { display: flex; align-items: center; gap: var(--sp-xs); }
+.trip-range .input { flex: 1 1 0; min-width: 0; }
+.trip-range-sep { color: var(--steel); flex-shrink: 0; }
+
+/* ---------- 이 달의 출장 목록 ---------- */
+.trip-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-md);
+  width: 100%;
+  padding: var(--sp-sm) var(--sp-md);
+  background: var(--canvas);
+  border: 1px solid var(--hairline-soft);
+  border-radius: var(--r-row);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--dur-ui) var(--ease-out),
+              background var(--dur-ui) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .trip-row:hover { background: var(--surface-soft); border-color: var(--hairline); }
+}
+.trip-row.is-past { opacity: 0.55; }
+.trip-bar {
+  width: 3px;
+  align-self: stretch;
+  min-height: 30px;
+  border-radius: var(--r-control);
+  flex-shrink: 0;
+  filter: var(--proj-adjust);
+}
+.trip-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.trip-title {
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-meta);
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.trip-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  font-size: var(--fs-caption);
+  color: var(--steel);
+  font-variant-numeric: tabular-nums;
+}
+.trip-place { display: inline-flex; align-items: center; gap: 3px; min-width: 0; }
+.trip-place .ico { width: 13px; height: 13px; }
+.trip-when {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-meta);
+  color: var(--steel);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  text-align: right;
+}
+.trip-when.is-now { color: var(--critical); font-weight: var(--fw-semi); }
+.trip-when.is-soon { color: var(--priority-high); }
+
+/* ---------- 좁은 화면 ----------
+   50px 남짓한 칸에 글자를 우겨넣지 않는다.
+   막대는 색과 길이만 남기고, 무엇인지는 아래 목록에서 읽는다. */
+@media (max-width: 599px) {
+  .cal { --num-h: 24px; --lane-h: 15px; --cell-min: 58px; }
+  .cal-day { padding: 4px 3px 5px; }
+  .cal-num { min-width: 19px; height: 19px; font-size: var(--fs-micro); padding: 0 3px; }
+  .cal-bar { font-size: 0; padding: 0 3px; }   /* 글자는 아래 목록에서 읽는다 */
+  .cal-month { font-size: var(--fs-body); min-width: 96px; }
+  .cal-head-row .btn { padding: 7px 13px; }
+}

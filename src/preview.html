@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>업무보드 · 디자인 미리보기</title>
+<link rel="stylesheet" href="./styles/tokens.css">
+<link rel="stylesheet" href="./styles/app.css">
+<link rel="stylesheet" href="./styles/layout.css">
+<link rel="stylesheet" href="./styles/board.css">
+<link rel="stylesheet" href="./styles/calendar.css">
+<!--
+  디자인만 확인하는 페이지. 로그인도 서버도 없이 열린다.
+  화면을 고칠 때 여기서 밝게/어둡게·좁게/넓게를 먼저 보고 실앱에 반영한다.
+  아이콘 모음은 index.html 것을 그대로 가져다 쓴다 (사본을 만들지 않는다).
+-->
+</head>
+<body>
+
+<div id="sprite-slot"></div>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand-block">
+      <span class="brand">업무보드</span>
+      <span class="today-label">2026년 8월 23일 (일)</span>
+    </div>
+    <div class="search-box">
+      <svg class="ico ico-sm"><use href="#i-search"></use></svg>
+      <input class="topbar-search" type="search" placeholder="업무 검색" autocomplete="off">
+      <span class="search-hint">/</span>
+    </div>
+    <div class="topbar-actions">
+      <nav class="view-tabs">
+        <button class="pill is-active">보드</button>
+        <button class="pill">전체</button>
+        <button class="pill">휴지통</button>
+      </nav>
+      <button class="icon-btn" id="btn-theme" title="화면 밝기 전환">
+        <svg class="ico"><use href="#i-auto" id="theme-icon"></use></svg>
+      </button>
+      <button class="icon-btn" title="설정"><svg class="ico"><use href="#i-settings"></use></svg></button>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="section">
+      <div class="section-head">
+        <span class="section-title-sm">사업</span>
+        <button class="icon-btn icon-btn-sm" title="사업 추가"><svg class="ico ico-sm"><use href="#i-plus"></use></svg></button>
+      </div>
+      <div class="stack">
+        <button class="side-project is-active">
+          <span class="side-dot" style="background:var(--stone)"></span>
+          <span class="side-name">전체 사업</span><span class="side-count">17</span>
+        </button>
+        <button class="side-project">
+          <span class="side-dot" style="background:#3c7fb0"></span>
+          <span class="side-name">2026 진로탐색 캠프</span><span class="side-count is-danger">2!</span>
+        </button>
+        <button class="side-project">
+          <span class="side-dot" style="background:#2e9a6e"></span>
+          <span class="side-name">청년마을 성과공유회</span><span class="side-count">5</span>
+        </button>
+        <button class="side-project">
+          <span class="side-dot" style="background:#a96b33"></span>
+          <span class="side-name">찾아가는 마을교육 워크숍</span><span class="side-count">4</span>
+        </button>
+        <button class="side-project">
+          <span class="side-dot" style="background:#7a45b5"></span>
+          <span class="side-name">도시재생 주민역량 세미나</span><span class="side-count">6</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="col">
+    <div class="project-chips">
+      <button class="pchip is-active">전체<span class="pchip-num">17</span></button>
+      <button class="pchip"><span class="pchip-dot" style="background:#3c7fb0"></span>진로탐색 캠프<span class="pchip-num">2!</span></button>
+      <button class="pchip"><span class="pchip-dot" style="background:#2e9a6e"></span>성과공유회<span class="pchip-num">5</span></button>
+      <button class="pchip"><span class="pchip-dot" style="background:#a96b33"></span>마을교육 워크숍<span class="pchip-num">4</span></button>
+    </div>
+
+    <main class="stack stack-xl" style="margin-top:var(--sp-base)">
+      <div class="summary-row">
+        <div class="sum"><span class="sum-value">8</span><span class="sum-label">오늘 할 일</span></div>
+        <span class="sum-sep"></span>
+        <div class="sum"><span class="sum-value">3</span><span class="sum-label">오늘 완료</span></div>
+        <span class="sum-sep"></span>
+        <div class="sum is-danger"><span class="sum-value">2</span><span class="sum-label">지연</span></div>
+        <span class="sum-sep"></span>
+        <div class="sum is-warn"><span class="sum-value">5</span><span class="sum-label">곧 마감</span></div>
+      </div>
+
+      <div class="quick-add">
+        <span class="quick-dot" style="background:#3c7fb0"></span>
+        <select class="quick-project"><option>2026 진로탐색 캠프</option></select>
+        <span class="quick-sep"></span>
+        <input class="input grow" type="text" placeholder="새 업무 입력 후 Enter">
+        <input class="quick-due" type="date">
+        <button class="btn btn-primary btn-sm">추가</button>
+      </div>
+
+      <section class="focus-card">
+        <div class="section-head">
+          <div class="stack" style="gap:2px">
+            <span class="section-title">오늘의 핵심 3</span>
+            <span class="section-note">2 / 3 · 오늘 반드시 끝낼 일</span>
+          </div>
+          <button class="btn btn-ghost btn-sm">급한 순으로 채우기</button>
+        </div>
+        <ol class="focus-slots">
+          <li class="fslot">
+            <div class="task is-overdue">
+              <input type="checkbox" class="task-check">
+              <div class="task-body">
+                <div class="task-title">캠프 운영인력 배치표 확정하고 담당 주무관 회신</div>
+                <div class="task-tags">
+                  <span class="chip chip-project"><span class="pchip-dot" style="background:#3c7fb0"></span>2026 진로탐색 캠프</span>
+                  <span class="chip chip-overdue">2일 지남</span>
+                  <span class="chip chip-urgent">긴급</span>
+                </div>
+              </div>
+              <button class="task-pin is-on"><svg class="ico ico-sm ico-fill"><use href="#i-star"></use></svg></button>
+            </div>
+          </li>
+          <li class="fslot">
+            <div class="task">
+              <input type="checkbox" class="task-check">
+              <div class="task-body">
+                <div class="task-title">성과공유회 발표자 4명 사전 인터뷰 일정 잡기</div>
+                <div class="task-tags">
+                  <span class="chip chip-project"><span class="pchip-dot" style="background:#2e9a6e"></span>청년마을 성과공유회</span>
+                  <span class="chip chip-due">내일 마감</span>
+                  <span class="chip chip-wait">외부 회신 대기</span>
+                </div>
+              </div>
+              <button class="task-pin is-on"><svg class="ico ico-sm ico-fill"><use href="#i-star"></use></svg></button>
+            </div>
+          </li>
+          <li class="fslot is-empty">
+            <button class="fslot-empty">
+              <svg class="ico ico-sm"><use href="#i-star"></use></svg><span>급한 일 하나 앉히기</span>
+            </button>
+          </li>
+        </ol>
+        <div class="focus-elsewhere">
+          <span class="focus-elsewhere-label">다른 사업의 핵심</span>
+          <button class="pchip"><span class="pchip-dot" style="background:#a96b33"></span>찾아가는 마을교육 워크숍<span class="pchip-num">3</span></button>
+          <button class="pchip"><span class="pchip-dot" style="background:#7a45b5"></span>도시재생 주민역량 세미나<span class="pchip-num">2</span></button>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <span class="section-title">사업별 오늘의 업무</span>
+          <label class="toggle-label"><input type="checkbox"> 완료 숨김</label>
+        </div>
+        <div class="stack stack-md grid-2">
+
+          <div class="pcard">
+            <button class="pcard-head" style="--pcolor:#3c7fb0">
+              <span class="pcard-bar" style="background:#3c7fb0"></span>
+              <span class="pcard-title">2026 진로탐색 캠프</span>
+              <span class="pcard-metrics">
+                <span class="chip chip-overdue">지연 2</span>
+                <span class="chip chip-due">3/4</span>
+                <svg class="ico ico-sm pcard-edit"><use href="#i-pencil"></use></svg>
+              </span>
+            </button>
+            <div class="pcard-body">
+              <div class="task is-flat is-overdue">
+                <input type="checkbox" class="task-check">
+                <div class="task-body">
+                  <div class="task-title">운영인력 배치표 확정하고 담당 주무관 회신</div>
+                  <div class="task-tags"><span class="chip chip-overdue">2일 지남</span><span class="chip chip-urgent">긴급</span></div>
+                </div>
+                <button class="task-pin is-on"><svg class="ico ico-sm ico-fill"><use href="#i-star"></use></svg></button>
+              </div>
+              <div class="task is-flat">
+                <input type="checkbox" class="task-check">
+                <div class="task-body">
+                  <div class="task-title">보험 가입 명단 최종본 넘기기</div>
+                  <div class="task-tags"><span class="chip chip-overdue">오늘 마감</span><span class="chip chip-stuck">6회 밀림</span></div>
+                </div>
+                <button class="task-pin"><svg class="ico ico-sm"><use href="#i-star"></use></svg></button>
+              </div>
+              <div class="task is-flat">
+                <input type="checkbox" class="task-check">
+                <div class="task-body">
+                  <div class="task-title">숙소 배정 초안 만들기</div>
+                  <div class="task-tags"><span class="chip chip-doing">진행 중</span><span class="chip chip-carried">2회 이월</span></div>
+                </div>
+                <button class="task-pin"><svg class="ico ico-sm"><use href="#i-star"></use></svg></button>
+              </div>
+              <div class="task is-flat is-done">
+                <input type="checkbox" class="task-check" checked>
+                <div class="task-body"><div class="task-title">현수막 시안 인쇄소 발주</div></div>
+                <button class="task-pin"><svg class="ico ico-sm"><use href="#i-star"></use></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pcard">
+            <button class="pcard-head" style="--pcolor:#2e9a6e">
+              <span class="pcard-bar" style="background:#2e9a6e"></span>
+              <span class="pcard-title">청년마을 성과공유회</span>
+              <span class="pcard-metrics">
+                <span class="chip chip-due">2/3</span>
+                <svg class="ico ico-sm pcard-edit"><use href="#i-pencil"></use></svg>
+              </span>
+            </button>
+            <div class="pcard-body">
+              <div class="task is-flat">
+                <input type="checkbox" class="task-check">
+                <div class="task-body">
+                  <div class="task-title">발표자 4명 사전 인터뷰 일정 잡기</div>
+                  <div class="task-tags"><span class="chip chip-due">내일 마감</span><span class="chip chip-wait">외부 회신 대기</span></div>
+                </div>
+                <button class="task-pin is-on"><svg class="ico ico-sm ico-fill"><use href="#i-star"></use></svg></button>
+              </div>
+              <div class="task is-flat">
+                <input type="checkbox" class="task-check">
+                <div class="task-body">
+                  <div class="task-title">행사장 음향 견적 두 곳 비교표 정리</div>
+                  <div class="task-tags"><span class="chip chip-due">4일 뒤</span><span class="chip chip-high">높음</span></div>
+                </div>
+                <button class="task-pin"><svg class="ico ico-sm"><use href="#i-star"></use></svg></button>
+              </div>
+              <div class="task is-flat is-done">
+                <input type="checkbox" class="task-check" checked>
+                <div class="task-body"><div class="task-title">참가 신청 폼 열고 안내문 발송</div></div>
+                <button class="task-pin"><svg class="ico ico-sm"><use href="#i-star"></use></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pcard">
+            <button class="pcard-head" style="--pcolor:#a96b33">
+              <span class="pcard-bar" style="background:#a96b33"></span>
+              <span class="pcard-title">찾아가는 마을교육 워크숍</span>
+              <span class="pcard-metrics">
+                <span class="chip chip-due">0/0</span>
+                <svg class="ico ico-sm pcard-edit"><use href="#i-pencil"></use></svg>
+              </span>
+            </button>
+            <div class="pcard-body">
+              <div class="pcard-empty">오늘 잡힌 업무가 없습니다.</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <span class="section-title">놓치고 있는 업무</span>
+          <span class="section-note">오늘 목록에 없는데 마감이 지났거나 임박한 것</span>
+        </div>
+        <div class="stack stack-md">
+          <div class="pcard">
+            <button class="pcard-head" style="--pcolor:#7a45b5">
+              <span class="pcard-bar" style="background:#7a45b5"></span>
+              <span class="pcard-title">도시재생 주민역량 세미나</span>
+              <span class="pcard-metrics">
+                <span class="chip chip-overdue">지연 1</span><span class="chip chip-due">2건</span>
+                <svg class="ico ico-sm pcard-edit"><use href="#i-pencil"></use></svg>
+              </span>
+            </button>
+            <div class="pcard-body">
+              <div class="task is-flat is-overdue">
+                <input type="checkbox" class="task-check">
+                <div class="task-body">
+                  <div class="task-title">3차 강의 강사료 지급 서류 제출</div>
+                  <div class="task-tags"><span class="chip chip-overdue">5일 지남</span></div>
+                </div>
+                <button class="btn btn-ghost btn-sm"><svg class="ico ico-sm"><use href="#i-today"></use></svg>오늘로</button>
+                <button class="task-pin"><svg class="ico ico-sm"><use href="#i-star"></use></svg></button>
+              </div>
+              <div class="task is-flat">
+                <input type="checkbox" class="task-check">
+                <div class="task-body">
+                  <div class="task-title">수료증 명단 대조하고 오탈자 확인</div>
+                  <div class="task-tags"><span class="chip chip-due">3일 뒤</span></div>
+                </div>
+                <button class="btn btn-ghost btn-sm"><svg class="ico ico-sm"><use href="#i-today"></use></svg>오늘로</button>
+                <button class="task-pin"><svg class="ico ico-sm"><use href="#i-star"></use></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- 출장 달력 ---------- -->
+      <section class="section" id="cal-section">
+        <div class="cal-head-row">
+          <div class="row" style="gap:var(--sp-xxs)">
+            <button class="icon-btn"><svg class="ico"><use href="#i-left"></use></svg></button>
+            <h2 class="cal-month">2026년 8월</h2>
+            <button class="icon-btn"><svg class="ico"><use href="#i-right"></use></svg></button>
+          </div>
+          <div class="row" style="gap:var(--sp-xs)">
+            <button class="btn btn-ghost btn-sm">이번 달</button>
+            <button class="btn btn-primary btn-sm"><svg class="ico ico-sm"><use href="#i-plus"></use></svg>출장 추가</button>
+          </div>
+        </div>
+        <div class="cal" id="cal-grid"></div>
+        <div class="section-head" style="margin-top:var(--sp-md)">
+          <span class="section-title">이 달의 출장</span>
+          <span class="section-note">5건</span>
+        </div>
+        <div class="stack stack-xs" id="trip-list"></div>
+      </section>
+
+      <!-- ---------- 사업 순서 바꾸기 ---------- -->
+      <section class="section">
+        <div class="section-head"><span class="section-title">사업 관리 (순서 바꾸기)</span></div>
+        <div class="card stack stack-lg">
+          <p class="text-sm muted">손잡이를 끌거나, 손잡이에 포커스를 두고 위아래 화살표를 누릅니다.</p>
+          <div class="sortable" id="manage-projects">
+            <div class="sortrow" data-id="p1">
+              <button class="grip" title="끌어서 순서 바꾸기"><svg class="ico"><use href="#i-grip"></use></svg></button>
+              <div class="sortrow-body">
+                <div class="sortrow-title"><span class="side-dot" style="background:#3c7fb0"></span><span class="sortrow-name">2026 진로탐색 캠프</span></div>
+                <div class="sortrow-meta">업무 18개 · 미완료 7개</div>
+              </div>
+              <button class="btn btn-ghost btn-sm"><svg class="ico ico-sm"><use href="#i-pencil"></use></svg>수정</button>
+            </div>
+            <div class="sortrow" data-id="p2">
+              <button class="grip" title="끌어서 순서 바꾸기"><svg class="ico"><use href="#i-grip"></use></svg></button>
+              <div class="sortrow-body">
+                <div class="sortrow-title"><span class="side-dot" style="background:#2e9a6e"></span><span class="sortrow-name">청년마을 성과공유회</span></div>
+                <div class="sortrow-meta">업무 14개 · 미완료 5개</div>
+              </div>
+              <button class="btn btn-ghost btn-sm"><svg class="ico ico-sm"><use href="#i-pencil"></use></svg>수정</button>
+            </div>
+            <div class="sortrow" data-id="p3">
+              <button class="grip" title="끌어서 순서 바꾸기"><svg class="ico"><use href="#i-grip"></use></svg></button>
+              <div class="sortrow-body">
+                <div class="sortrow-title"><span class="side-dot" style="background:#a96b33"></span><span class="sortrow-name">찾아가는 마을교육 워크숍</span></div>
+                <div class="sortrow-meta">업무 11개 · 미완료 4개</div>
+              </div>
+              <button class="btn btn-ghost btn-sm"><svg class="ico ico-sm"><use href="#i-pencil"></use></svg>수정</button>
+            </div>
+            <div class="sortrow" data-id="p4">
+              <button class="grip" title="끌어서 순서 바꾸기"><svg class="ico"><use href="#i-grip"></use></svg></button>
+              <div class="sortrow-body">
+                <div class="sortrow-title"><span class="side-dot" style="background:#7a45b5"></span><span class="sortrow-name">도시재생 주민역량 세미나</span><span class="chip chip-carried">보관됨</span></div>
+                <div class="sortrow-meta">업무 9개 · 미완료 6개</div>
+              </div>
+              <button class="btn btn-ghost btn-sm"><svg class="ico ico-sm"><use href="#i-pencil"></use></svg>수정</button>
+            </div>
+          </div>
+          <p class="text-cap muted" id="sort-result">순서: p1, p2, p3, p4</p>
+        </div>
+      </section>
+
+      <!-- ---------- 낱개 부품 ---------- -->
+      <section class="section" style="padding-top:var(--sp-xl);border-top:1px solid var(--hairline-soft)">
+        <div class="section-head"><span class="section-title">부품</span></div>
+
+        <div class="row wrap">
+          <button class="btn btn-primary">기본 동작</button>
+          <button class="btn btn-cta">확정 동작</button>
+          <button class="btn btn-secondary">보조</button>
+          <button class="btn btn-ghost">약한 보조</button>
+          <button class="btn btn-ghost btn-danger"><svg class="ico ico-sm"><use href="#i-trash"></use></svg>삭제</button>
+          <button class="btn btn-primary" disabled>못 누름</button>
+          <button class="btn btn-cta"><span class="spinner"></span>처리 중</button>
+        </div>
+
+        <div class="row wrap">
+          <span class="badge badge-urgent">긴급</span>
+          <span class="badge badge-high">높음</span>
+          <span class="badge badge-doing">진행 중</span>
+          <span class="badge badge-wait">외부 회신 대기</span>
+          <span class="badge badge-success">완료</span>
+          <span class="badge badge-overdue">3일 지남</span>
+          <span class="badge badge-normal">보통</span>
+        </div>
+
+        <div class="filter-row">
+          <button class="pill is-active">전체</button>
+          <button class="pill">진행 전</button>
+          <button class="pill">진행 중</button>
+          <button class="pill">내부 대기</button>
+          <button class="pill">완료</button>
+        </div>
+
+        <div class="opt-row">
+          <button class="opt is-on" data-tone="urgent">긴급</button>
+          <button class="opt" data-tone="high">높음</button>
+          <button class="opt">보통</button>
+          <button class="opt is-on" data-tone="doing">진행 중</button>
+          <button class="opt is-on" data-tone="wait">외부 회신 대기</button>
+          <button class="opt is-on" data-tone="done">완료</button>
+        </div>
+
+        <div class="swatch-row">
+          <button class="swatch is-on" style="background:#ab4636"></button>
+          <button class="swatch" style="background:#a96b33"></button>
+          <button class="swatch" style="background:#9a7f2e"></button>
+          <button class="swatch" style="background:#658f32"></button>
+          <button class="swatch" style="background:#2e9a6e"></button>
+          <button class="swatch" style="background:#2f9c9a"></button>
+          <button class="swatch" style="background:#3c7fb0"></button>
+          <button class="swatch" style="background:#4a5cb8"></button>
+          <button class="swatch" style="background:#7a45b5"></button>
+          <button class="swatch" style="background:#a93b77"></button>
+        </div>
+
+        <div class="stack stack-md" style="max-width:420px">
+          <div class="field">
+            <label class="field-label" for="pv-in">사업명</label>
+            <input class="input" id="pv-in" placeholder="예: 2026 청소년 진로캠프">
+            <span class="field-hint">사업 목록과 카드 머리글에 쓰입니다.</span>
+          </div>
+          <div class="notice notice-info">가져올 파일을 확인했습니다. 사업 5개 · 업무 52개.</div>
+          <div class="notice notice-success">옮겼습니다. 사업 5개 · 업무 52개 · 출장 0개</div>
+          <div class="notice notice-error">불러오지 못했습니다: 네트워크 연결을 확인해 주세요.</div>
+          <div class="notice notice-muted">3회 이월된 업무입니다. 계속 밀린다면 쪼개거나 넘기는 것도 방법입니다.</div>
+          <div class="empty">빠뜨린 업무가 없습니다. 마감이 가까운 일은 모두 오늘 목록에 들어와 있습니다.</div>
+        </div>
+
+        <div class="row wrap">
+          <button class="btn btn-primary btn-sm" id="btn-sheet">시트 열기</button>
+          <button class="btn btn-primary btn-sm" id="btn-toast">토스트 띄우기</button>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<nav class="tabbar">
+  <button class="tabbar-btn is-active"><svg class="ico"><use href="#i-board"></use></svg>보드</button>
+  <button class="tabbar-btn"><svg class="ico"><use href="#i-list"></use></svg>전체</button>
+  <button class="tabbar-add"><svg class="ico"><use href="#i-plus"></use></svg></button>
+  <button class="tabbar-btn"><svg class="ico"><use href="#i-trash"></use></svg>휴지통</button>
+  <button class="tabbar-btn"><svg class="ico"><use href="#i-settings"></use></svg>설정</button>
+</nav>
+
+<div id="sheet-backdrop" class="sheet-backdrop">
+  <div class="sheet" role="dialog" aria-modal="true">
+    <div class="sheet-grab"></div>
+    <div class="sheet-head">
+      <h3>업무 상세</h3>
+      <button class="icon-btn" id="btn-sheet-close" aria-label="닫기"><svg class="ico"><use href="#i-close"></use></svg></button>
+    </div>
+    <div class="field">
+      <label class="field-label" for="pv-title">업무명</label>
+      <textarea class="input" id="pv-title" rows="2">운영인력 배치표 확정하고 담당 주무관 회신</textarea>
+    </div>
+    <div class="field">
+      <label class="field-label" for="pv-proj">사업</label>
+      <select class="input" id="pv-proj"><option>2026 진로탐색 캠프</option></select>
+    </div>
+    <div class="field">
+      <span class="field-label">우선순위</span>
+      <div class="opt-row">
+        <button class="opt is-on" data-tone="urgent">긴급</button>
+        <button class="opt">높음</button>
+        <button class="opt">보통</button>
+      </div>
+    </div>
+    <div class="field">
+      <span class="field-label">상태</span>
+      <div class="opt-row">
+        <button class="opt">진행 전</button>
+        <button class="opt is-on" data-tone="doing">진행 중</button>
+        <button class="opt">내부 확인 대기</button>
+        <button class="opt">외부 회신 대기</button>
+        <button class="opt">완료</button>
+      </div>
+    </div>
+    <div class="notice notice-muted">6회 이월된 업무입니다. 계속 밀린다면 쪼개거나 넘기는 것도 방법입니다.</div>
+    <div class="sheet-actions">
+      <button class="btn btn-cta grow">저장</button>
+      <button class="btn btn-ghost btn-danger"><svg class="ico ico-sm"><use href="#i-trash"></use></svg>삭제</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast">완료했습니다<button class="toast-action">되돌리기</button><span class="toast-key">Ctrl+Z</span></div>
+
+<script type="module">
+// 아이콘 모음은 index.html 에 있는 것 하나만 쓴다. 여기서 사본을 만들지 않는다.
+const html = await (await fetch('./index.html')).text();
+const sprite = new DOMParser().parseFromString(html, 'text/html').querySelector('svg.sprite');
+if (sprite) document.getElementById('sprite-slot').appendChild(sprite);
+
+const THEMES = ['auto', 'light', 'dark'];
+const ICONS = { auto: '#i-auto', light: '#i-sun', dark: '#i-moon' };
+let ti = 0;
+document.getElementById('btn-theme').addEventListener('click', () => {
+  ti = (ti + 1) % 3;
+  const t = THEMES[ti];
+  if (t === 'auto') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('theme-icon').setAttribute('href', ICONS[t]);
+});
+
+const back = document.getElementById('sheet-backdrop');
+const open = () => { back.classList.add('is-open'); document.body.classList.add('is-locked'); };
+const close = () => { back.classList.remove('is-open'); document.body.classList.remove('is-locked'); };
+document.getElementById('btn-sheet').addEventListener('click', open);
+document.getElementById('btn-sheet-close').addEventListener('click', close);
+back.addEventListener('click', (e) => { if (e.target === back) close(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+
+const toast = document.getElementById('toast');
+document.getElementById('btn-toast').addEventListener('click', () => {
+  toast.classList.add('is-open');
+  setTimeout(() => toast.classList.remove('is-open'), 3000);
+});
+
+// 달력 — 격자와 막대를 여기서 만든다. 실앱의 views.js 와 같은 클래스를 쓰므로
+// CSS 를 고치면 여기서 바로 확인된다. (마크업 구조를 바꾸면 양쪽 다 고쳐야 한다.)
+{
+  const YM = '2026-08', TODAY = '2026-08-23';
+  const trips = [
+    { id:'t1', title:'완주군 사전답사', s:'2026-08-05', e:'2026-08-06', loc:'전북 완주군청', pj:'2026 진로탐색 캠프', c:'#3c7fb0' },
+    { id:'t2', title:'캠프 본행사',     s:'2026-08-12', e:'2026-08-15', loc:'무주 덕유산청소년수련원', pj:'2026 진로탐색 캠프', c:'#3c7fb0' },
+    { id:'t3', title:'장소 답사',       s:'2026-08-13', e:'2026-08-13', loc:'전주 한옥마을', pj:'청년마을 성과공유회', c:'#2e9a6e' },
+    { id:'t4', title:'3차 강의',        s:'2026-08-19', e:'2026-08-21', loc:'남원시청', pj:'찾아가는 마을교육 워크숍', c:'#a96b33' },
+    { id:'t5', title:'주 넘는 출장',    s:'2026-08-21', e:'2026-08-25', loc:'서울', pj:'2026 진로탐색 캠프', c:'#3c7fb0' },
+    { id:'t6', title:'월 넘는 워크숍',  s:'2026-08-30', e:'2026-09-02', loc:'여수', pj:'청년마을 성과공유회', c:'#2e9a6e' },
+  ].sort((a,b) => a.s.localeCompare(b.s));
+
+  const p = (n) => String(n).padStart(2,'0');
+  const str = (d) => `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+  const parse = (s) => new Date(`${s}T00:00:00`);
+  const add = (s,n) => { const d = parse(s); d.setDate(d.getDate()+n); return str(d); };
+  const diff = (a,b) => Math.round((parse(b)-parse(a))/86400000);
+
+  const [y,m] = YM.split('-').map(Number);
+  const first = str(new Date(y,m-1,1)), last = str(new Date(y,m,0));
+  const gs = add(first, -parse(first).getDay()), ge = add(last, 6-parse(last).getDay());
+
+  const grid = document.getElementById('cal-grid');
+  const dow = document.createElement('div');
+  dow.className = 'cal-dow';
+  ['일','월','화','수','목','금','토'].forEach(d => {
+    const s = document.createElement('span'); s.textContent = d; dow.appendChild(s); });
+  grid.appendChild(dow);
+
+  for (let ws = gs; ws <= ge; ws = add(ws,7)) {
+    const we = add(ws,6);
+    const week = document.createElement('div');
+    week.className = 'cal-week';
+    const laneEnds = [], segs = [];
+    trips.forEach(t => {
+      if (t.e < ws || t.s > we) return;
+      const i0 = diff(ws, t.s < ws ? ws : t.s), i1 = diff(ws, t.e > we ? we : t.e);
+      let lane = laneEnds.findIndex(end => end < i0);
+      if (lane < 0) { lane = laneEnds.length; laneEnds.push(-1); }
+      laneEnds[lane] = i1;
+      segs.push({ t, i0, i1, lane, cl: t.s < ws, cr: t.e > we });
+    });
+    week.style.setProperty('--lanes', laneEnds.length);
+
+    const days = document.createElement('div');
+    days.className = 'cal-days';
+    for (let i = 0; i < 7; i++) {
+      const date = add(ws,i);
+      const cell = document.createElement('button');
+      cell.type = 'button';
+      cell.className = 'cal-day'
+        + (date.slice(0,7) !== YM ? ' is-outside' : '')
+        + (date === TODAY ? ' is-today' : '')
+        + (i === 0 ? ' is-sun' : '') + (i === 6 ? ' is-sat' : '');
+      cell.innerHTML = `<span class="cal-num">${Number(date.slice(8))}</span>`;
+      days.appendChild(cell);
+    }
+    week.appendChild(days);
+
+    const bars = document.createElement('div');
+    bars.className = 'cal-bars';
+    segs.forEach(g => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'cal-bar' + (g.cl ? ' cont-left' : '') + (g.cr ? ' cont-right' : '');
+      b.style.left = `calc(${(g.i0/7)*100}% + 3px)`;
+      b.style.width = `calc(${((g.i1-g.i0+1)/7)*100}% - 6px)`;
+      b.style.setProperty('--lane', g.lane);
+      b.style.setProperty('--tcolor', g.t.c);
+      b.textContent = g.t.title;
+      bars.appendChild(b);
+    });
+    week.appendChild(bars);
+    grid.appendChild(week);
+  }
+
+  const sd = (s) => `${Number(s.slice(5,7))}.${Number(s.slice(8))}`;
+  const list = document.getElementById('trip-list');
+  trips.filter(t => t.e >= first && t.s <= last).forEach(t => {
+    const days = diff(t.s, t.e) + 1;
+    const when = (t.s <= TODAY && TODAY <= t.e) ? ['진행 중','is-now']
+      : t.s > TODAY ? [`${diff(TODAY, t.s)}일 뒤`, diff(TODAY, t.s) <= 7 ? 'is-soon' : ''] : ['지남',''];
+    const row = document.createElement('button');
+    row.type = 'button';
+    row.className = 'trip-row' + (t.e < TODAY ? ' is-past' : '');
+    row.innerHTML =
+      `<span class="trip-bar" style="background:${t.c}"></span>
+       <span class="trip-body">
+         <span class="trip-title">${t.title}</span>
+         <span class="trip-meta">
+           <span>${t.s === t.e ? sd(t.s) : `${sd(t.s)} ~ ${sd(t.e)} · ${days}일`}</span>
+           <span class="trip-place"><svg class="ico"><use href="#i-pin-map"></use></svg>${t.loc}</span>
+           <span class="chip chip-project"><span class="pchip-dot" style="background:${t.c}"></span>${t.pj}</span>
+         </span>
+       </span>
+       <span class="trip-when ${when[1]}">${when[0]}</span>`;
+    list.appendChild(row);
+  });
+}
+
+// 순서 바꾸기 — 실앱과 같은 sortable.js 를 쓴다. 저장만 하지 않고 결과를 아래에 적는다.
+const { enableSort } = await import('./js/sortable.js');
+const sortBox = document.getElementById('manage-projects');
+const showOrder = () => {
+  document.getElementById('sort-result').textContent =
+    '순서: ' + [...sortBox.querySelectorAll('.sortrow')].map(r => r.dataset.id).join(', ');
+};
+enableSort(sortBox, {
+  onReorder: showOrder,
+  onStep: (id, delta) => {
+    const rows = [...sortBox.querySelectorAll('.sortrow')];
+    const i = rows.findIndex(r => r.dataset.id === id);
+    const j = i + delta;
+    if (j < 0 || j >= rows.length) return;
+    sortBox.insertBefore(rows[i], delta < 0 ? rows[j] : rows[j].nextElementSibling);
+    rows[i].querySelector('.grip').focus();
+    showOrder();
+  },
+});
+</script>
+</body>
+</html>

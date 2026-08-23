@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14171b" media="(prefers-color-scheme: dark)">
+<title>업무보드</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./styles/tokens.css">
+<link rel="stylesheet" href="./styles/app.css">
+<link rel="stylesheet" href="./styles/layout.css">
+<link rel="stylesheet" href="./styles/board.css">
+<link rel="stylesheet" href="./styles/calendar.css">
+</head>
+<body>
+
+<!-- ============================================================
+     아이콘 모음
+     이모지를 쓰지 않는 이유: 기기마다 다른 그림이 나오고, 컬러 이모지는
+     화면의 색 규칙을 혼자 무시한다. 선 굵기를 1.6 으로 맞춘 한 벌만 쓴다.
+     ============================================================ -->
+<svg class="sprite" aria-hidden="true" focusable="false" style="display:none">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.8-3.8"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></symbol>
+  <symbol id="i-board" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M9.5 4.5v15"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8.5 6.5h11M8.5 12h11M8.5 17.5h11M4.5 6.5h.01M4.5 12h.01M4.5 17.5h.01"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 6.5h16M9.5 6.5V4.8a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v1.7M6.6 6.5l.8 12.2a1.5 1.5 0 0 0 1.5 1.4h6.2a1.5 1.5 0 0 0 1.5-1.4l.8-12.2M10 10.5v6M14 10.5v6"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.1"/><path d="M19.1 14.6a1.5 1.5 0 0 0 .3 1.66l.05.05a1.85 1.85 0 1 1-2.62 2.62l-.05-.05a1.5 1.5 0 0 0-1.66-.3 1.5 1.5 0 0 0-.9 1.37v.15a1.85 1.85 0 1 1-3.7 0v-.08a1.5 1.5 0 0 0-.98-1.37 1.5 1.5 0 0 0-1.66.3l-.05.05a1.85 1.85 0 1 1-2.62-2.62l.05-.05a1.5 1.5 0 0 0 .3-1.66 1.5 1.5 0 0 0-1.37-.9h-.15a1.85 1.85 0 1 1 0-3.7h.08a1.5 1.5 0 0 0 1.37-.98 1.5 1.5 0 0 0-.3-1.66l-.05-.05A1.85 1.85 0 1 1 7.24 4.7l.05.05a1.5 1.5 0 0 0 1.66.3h.07a1.5 1.5 0 0 0 .9-1.37v-.15a1.85 1.85 0 1 1 3.7 0v.08a1.5 1.5 0 0 0 .9 1.37 1.5 1.5 0 0 0 1.66-.3l.05-.05a1.85 1.85 0 1 1 2.62 2.62l-.05.05a1.5 1.5 0 0 0-.3 1.66v.07a1.5 1.5 0 0 0 1.37.9h.15a1.85 1.85 0 1 1 0 3.7h-.08a1.5 1.5 0 0 0-1.37.9z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.6l2.63 5.33 5.87.86-4.25 4.14 1 5.85L12 17.02l-5.25 2.76 1-5.85-4.25-4.14 5.87-.86z"/></symbol>
+  <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M4 20h4L18.3 9.7a2.83 2.83 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.6v2M12 19.4v2M21.4 12h-2M4.6 12h-2M18.6 5.4l-1.4 1.4M6.8 17.2l-1.4 1.4M18.6 18.6l-1.4-1.4M6.8 6.8L5.4 5.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 14.6A8.6 8.6 0 0 1 9.4 3.5a8.6 8.6 0 1 0 11.1 11.1z"/></symbol>
+  <symbol id="i-auto" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M12 3.4a8.6 8.6 0 0 1 0 17.2z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20.4 12a8.4 8.4 0 1 1-2.5-6"/><path d="M20.4 4.4V10h-5.6"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M14.5 4.5H18a1.5 1.5 0 0 1 1.5 1.5v12a1.5 1.5 0 0 1-1.5 1.5h-3.5"/><path d="M9.5 16l-4-4 4-4M5.5 12h9"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M4.5 9.5h10.5a4.75 4.75 0 0 1 0 9.5H9"/><path d="M8.5 5.5l-4 4 4 4"/></symbol>
+  <symbol id="i-today" viewBox="0 0 24 24"><path d="M12 4v10.5M7.8 10.3L12 14.5l4.2-4.2M5 20h14"/></symbol>
+  <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="2.5" y="6.5" width="19" height="11" rx="2"/><path d="M6.5 10.5h.01M10.2 10.5h.01M13.8 10.5h.01M17.5 10.5h.01M8.5 14.2h7"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3.5v4M16 3.5v4"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M14.5 5.5L8 12l6.5 6.5"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M9.5 5.5L16 12l-6.5 6.5"/></symbol>
+  <symbol id="i-pin-map" viewBox="0 0 24 24"><path d="M12 21s6.5-6.1 6.5-11a6.5 6.5 0 1 0-13 0c0 4.9 6.5 11 6.5 11z"/><circle cx="12" cy="10" r="2.4"/></symbol>
+  <symbol id="i-grip" viewBox="0 0 24 24"><g fill="currentColor" stroke="none"><circle cx="9" cy="6" r="1.4"/><circle cx="15" cy="6" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="9" cy="18" r="1.4"/><circle cx="15" cy="18" r="1.4"/></g></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3.6 6.8l7.5 5.4a1.5 1.5 0 0 0 1.8 0l7.5-5.4"/></symbol>
+</svg>
+
+<!-- ============ 로그인 ============ -->
+<section id="view-login" class="center-screen">
+  <div class="center-card card card-lg stack stack-lg">
+    <div class="stack stack-xs">
+      <h1>업무보드</h1>
+      <p class="text-sm muted">여러 사업의 오늘 할 일을 한자리에서.</p>
+    </div>
+    <div class="field">
+      <label class="field-label" for="email">이메일</label>
+      <input class="input" id="email" type="email" inputmode="email" autocomplete="email"
+             placeholder="name@example.com">
+      <p class="field-hint">비밀번호 없이, 메일로 오는 링크를 눌러 로그인합니다.</p>
+    </div>
+    <button class="btn btn-primary btn-block" id="btn-login">
+      <svg class="ico ico-sm"><use href="#i-mail"></use></svg>로그인 링크 받기
+    </button>
+    <div id="login-msg" class="hidden"></div>
+  </div>
+</section>
+
+<!-- ============ 앱 ============ -->
+<div id="view-app" class="hidden">
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-block">
+        <span class="brand">업무보드</span>
+        <span class="today-label" id="today-label"></span>
+      </div>
+
+      <div class="search-box">
+        <svg class="ico ico-sm"><use href="#i-search"></use></svg>
+        <input class="topbar-search" id="search" type="search" placeholder="업무 검색" autocomplete="off">
+        <span class="search-hint" id="search-hint">/</span>
+      </div>
+
+      <div class="topbar-actions">
+        <nav class="view-tabs" role="tablist" aria-label="화면 전환">
+          <button class="pill is-active" data-view="board">보드</button>
+          <button class="pill" data-view="list">전체</button>
+          <button class="pill" data-view="calendar">달력</button>
+          <button class="pill" data-view="trash">휴지통</button>
+        </nav>
+        <button class="icon-btn" id="btn-theme" title="화면 밝기 전환" aria-label="화면 밝기 전환">
+          <svg class="ico"><use href="#i-auto" id="theme-icon"></use></svg>
+        </button>
+        <button class="icon-btn" data-view="settings" title="설정" aria-label="설정">
+          <svg class="ico"><use href="#i-settings"></use></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="shell">
+
+    <!-- 사업 사이드바 (PC) -->
+    <aside class="sidebar">
+      <div class="section">
+        <div class="section-head">
+          <span class="section-title-sm">사업</span>
+          <button class="icon-btn icon-btn-sm" id="btn-add-project" title="사업 추가" aria-label="사업 추가">
+            <svg class="ico ico-sm"><use href="#i-plus"></use></svg>
+          </button>
+        </div>
+        <div class="stack" id="side-projects"></div>
+      </div>
+    </aside>
+
+    <div class="col">
+      <!-- 사업 칩 (모바일/태블릿) -->
+      <div class="project-chips" id="project-chips"></div>
+
+      <!-- ---------- 보드 ---------- -->
+      <main id="pane-board" class="stack stack-xl" style="margin-top:var(--sp-base)">
+        <div class="summary-row" id="summary"></div>
+
+        <div class="quick-add">
+          <span class="quick-dot" id="quick-dot" aria-hidden="true"></span>
+          <select class="quick-project" id="quick-project" aria-label="사업 선택"></select>
+          <span class="quick-sep" aria-hidden="true"></span>
+          <input class="input grow" id="quick-title" type="text" placeholder="새 업무 입력 후 Enter" autocomplete="off">
+          <input class="quick-due" id="quick-due" type="date" title="마감일 (선택)" aria-label="마감일">
+          <button class="btn btn-primary btn-sm" id="btn-quick-add">추가</button>
+        </div>
+
+        <!-- 핵심 3 — 사업마다 세 자리씩 있다. 지금 보고 있는 범위의 세 자리를 보여준다. -->
+        <section class="focus-card">
+          <div class="section-head">
+            <div class="stack" style="gap:2px">
+              <span class="section-title" id="focus-title">오늘의 핵심 3</span>
+              <span class="section-note" id="focus-note"></span>
+            </div>
+            <button class="btn btn-ghost btn-sm" id="btn-suggest">급한 순으로 채우기</button>
+          </div>
+          <ol class="focus-slots" id="list-focus"></ol>
+          <div class="focus-elsewhere hidden" id="focus-elsewhere"></div>
+        </section>
+
+        <!-- 사업별 오늘의 업무 (메인) -->
+        <section class="section">
+          <div class="section-head">
+            <span class="section-title">사업별 오늘의 업무</span>
+            <label class="toggle-label">
+              <input type="checkbox" id="hide-done"> 완료 숨김
+            </label>
+          </div>
+          <div class="stack stack-md grid-2" id="list-projects"></div>
+        </section>
+
+        <!-- 오늘 목록에 없는데 마감이 임박한 것 -->
+        <section class="section" id="sec-due">
+          <div class="section-head">
+            <span class="section-title">놓치고 있는 업무</span>
+            <span class="section-note">오늘 목록에 없는데 마감이 지났거나 임박한 것</span>
+          </div>
+          <div class="stack stack-md" id="list-due"></div>
+        </section>
+      </main>
+
+      <!-- ---------- 출장 달력 ---------- -->
+      <main id="pane-calendar" class="stack stack-lg hidden" style="margin-top:var(--sp-base)">
+        <div class="cal-head-row">
+          <div class="row" style="gap:var(--sp-xxs)">
+            <button class="icon-btn" id="cal-prev" title="지난 달" aria-label="지난 달">
+              <svg class="ico"><use href="#i-left"></use></svg>
+            </button>
+            <h2 class="cal-month" id="cal-month">·</h2>
+            <button class="icon-btn" id="cal-next" title="다음 달" aria-label="다음 달">
+              <svg class="ico"><use href="#i-right"></use></svg>
+            </button>
+          </div>
+          <div class="row" style="gap:var(--sp-xs)">
+            <button class="btn btn-ghost btn-sm" id="cal-today">이번 달</button>
+            <button class="btn btn-primary btn-sm" id="btn-add-trip">
+              <svg class="ico ico-sm"><use href="#i-plus"></use></svg>출장 추가
+            </button>
+          </div>
+        </div>
+
+        <div class="cal" id="cal-grid"></div>
+
+        <section class="section">
+          <div class="section-head">
+            <span class="section-title">이 달의 출장</span>
+            <span class="section-note" id="cal-count"></span>
+          </div>
+          <div class="stack stack-xs" id="trip-list"></div>
+        </section>
+      </main>
+
+      <!-- ---------- 전체 목록 ---------- -->
+      <main id="pane-list" class="stack stack-lg col-read hidden" style="margin-top:var(--sp-base)">
+        <div class="filter-row" id="status-filters"></div>
+        <div class="stack stack-xs" id="list-all"></div>
+      </main>
+
+      <!-- ---------- 휴지통 ---------- -->
+      <main id="pane-trash" class="stack stack-lg col-read hidden" style="margin-top:var(--sp-base)">
+        <p class="text-sm muted">삭제한 업무는 여기 남습니다. 복구하거나 그대로 두시면 됩니다.</p>
+        <div class="stack stack-xs" id="list-trash"></div>
+      </main>
+
+      <!-- ---------- 설정 ---------- -->
+      <main id="pane-settings" class="stack stack-lg col-read hidden" style="margin-top:var(--sp-base)">
+
+        <div class="card stack stack-lg">
+          <div class="row-between wrap">
+            <div class="stack stack-xs">
+              <h2>계정</h2>
+              <p class="text-sm muted" id="user-email"></p>
+            </div>
+            <button class="btn btn-ghost btn-sm" id="btn-logout">
+              <svg class="ico ico-sm"><use href="#i-logout"></use></svg>로그아웃
+            </button>
+          </div>
+        </div>
+
+        <div class="card stack stack-lg">
+          <div class="row-between wrap">
+            <div class="stack stack-xs">
+              <h2>사업 관리</h2>
+              <p class="text-sm muted">
+                손잡이를 끌어 순서를 바꿉니다. 이 순서대로 사이드바와 보드에 나옵니다.
+              </p>
+            </div>
+            <button class="btn btn-primary btn-sm" id="btn-add-project-2">
+              <svg class="ico ico-sm"><use href="#i-plus"></use></svg>사업 추가
+            </button>
+          </div>
+          <div class="sortable" id="manage-projects"></div>
+        </div>
+
+        <div class="card stack stack-lg">
+          <div class="row-between wrap">
+            <div class="stack stack-xs">
+              <h2>휴지통</h2>
+              <p class="text-sm muted" id="trash-count">삭제한 업무가 남아 있습니다.</p>
+            </div>
+            <button class="btn btn-ghost btn-sm" data-view="trash">
+              <svg class="ico ico-sm"><use href="#i-trash"></use></svg>휴지통 열기
+            </button>
+          </div>
+        </div>
+
+        <div class="card stack stack-lg">
+          <div class="stack stack-xs">
+            <h2>키보드 단축키</h2>
+            <p class="text-sm muted">입력창 밖에서 누릅니다.</p>
+          </div>
+          <div class="keys text-sm">
+            <kbd>/</kbd><span>검색으로 이동</span>
+            <kbd>N</kbd><span>새 업무 입력창으로</span>
+            <kbd>1</kbd><span>보드</span>
+            <kbd>2</kbd><span>전체 목록</span>
+            <kbd>3</kbd><span>출장 달력</span>
+            <kbd>4</kbd><span>휴지통</span>
+            <kbd>5</kbd><span>설정</span>
+            <kbd>← →</kbd><span>달력에서 지난 달 · 다음 달</span>
+            <kbd>Esc</kbd><span>시트 닫기 · 검색어 지우기</span>
+            <kbd>Ctrl</kbd><span>상세에서 Enter 와 함께 눌러 저장</span>
+          </div>
+        </div>
+
+        <div class="card stack stack-lg">
+          <div class="row-between wrap">
+            <h2>서버 데이터</h2>
+            <button class="btn btn-ghost btn-sm" id="btn-refresh">
+              <svg class="ico ico-sm"><use href="#i-refresh"></use></svg>새로고침
+            </button>
+          </div>
+          <div class="summary-row" id="db-stats"></div>
+        </div>
+
+        <div class="card stack stack-lg">
+          <div class="stack stack-xs">
+            <h2>밀린 업무 정리</h2>
+            <p class="text-sm muted">
+              기한이 지난 미완료 업무의 마감일을 옮기고, 이월 횟수를 초기화합니다.
+              쌓인 이월 표시를 걷어내고 다시 시작할 때 씁니다.
+            </p>
+          </div>
+          <div class="field">
+            <label class="field-label" for="cleanup-date">지난 마감일을 이 날짜로</label>
+            <input class="input" id="cleanup-date" type="date">
+          </div>
+          <label class="row text-sm" style="gap:var(--sp-xs);cursor:pointer">
+            <input type="checkbox" id="cleanup-reset" checked> 이월 횟수도 모두 0으로
+          </label>
+          <label class="row text-sm" style="gap:var(--sp-xs);cursor:pointer">
+            <input type="checkbox" id="cleanup-pull" checked> 미완료 업무를 오늘 할 일로
+          </label>
+          <button class="btn btn-cta" id="btn-cleanup">정리 실행</button>
+          <div id="cleanup-msg" class="hidden"></div>
+        </div>
+
+        <div class="card stack stack-lg">
+          <div class="stack stack-xs">
+            <h2>기존 데이터 가져오기</h2>
+            <p class="text-sm muted">
+              데스크톱 앱의 <code>dashboard.json</code>·<code>trips.json</code>. 여러 번 올려도 중복되지 않습니다.
+            </p>
+          </div>
+          <div class="stack stack-md">
+            <div class="field">
+              <label class="field-label" for="file-dashboard">dashboard.json</label>
+              <input class="input" id="file-dashboard" type="file" accept=".json,application/json">
+            </div>
+            <div class="field">
+              <label class="field-label" for="file-trips">trips.json (선택)</label>
+              <input class="input" id="file-trips" type="file" accept=".json,application/json">
+            </div>
+          </div>
+          <div id="preview" class="hidden stack stack-md">
+            <h3>이렇게 들어갑니다</h3>
+            <div class="summary-row" id="preview-stats"></div>
+            <div id="preview-warnings" class="hidden"></div>
+          </div>
+          <button class="btn btn-cta" id="btn-import" disabled>서버로 옮기기</button>
+          <div id="import-msg" class="hidden"></div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- 하단 탭바 (모바일) -->
+  <nav class="tabbar" aria-label="화면 전환">
+    <button class="tabbar-btn is-active" data-view="board">
+      <svg class="ico"><use href="#i-board"></use></svg>보드
+    </button>
+    <button class="tabbar-btn" data-view="list">
+      <svg class="ico"><use href="#i-list"></use></svg>전체
+    </button>
+    <button class="tabbar-add" id="tab-add" aria-label="새 업무 추가">
+      <svg class="ico"><use href="#i-plus"></use></svg>
+    </button>
+    <!-- 폰에서는 자리가 다섯 뿐이다. 휴지통은 어쩌다 한 번 열지만
+         달력은 일정을 확인하러 자주 연다. 휴지통은 설정 안으로 옮겼다. -->
+    <button class="tabbar-btn" data-view="calendar">
+      <svg class="ico"><use href="#i-calendar"></use></svg>달력
+    </button>
+    <button class="tabbar-btn" data-view="settings">
+      <svg class="ico"><use href="#i-settings"></use></svg>설정
+    </button>
+  </nav>
+</div>
+
+<!-- 편집 시트 -->
+<div id="sheet-backdrop" class="sheet-backdrop"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script type="module" src="./js/main.js"></script>
+</body>
+</html>

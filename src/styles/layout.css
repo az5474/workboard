@@ -1,0 +1,379 @@
+/* ============================================================
+   반응형 셸
+     모바일  (< 768)  : 상단 간략바 + 사업 칩 가로스크롤 + 하단 탭바
+     태블릿  (768~1023): 2단 그리드, 사이드바는 접힘
+     PC      (>= 1024) : 좌측 사업 사이드바 + 메인
+   ============================================================ */
+
+/* ---------- 상단 바 ---------- */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: color-mix(in srgb, var(--canvas) 88%, transparent);
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--hairline-soft);
+  padding-top: env(safe-area-inset-top);
+}
+/* 투명도를 줄여달라는 설정에서는 그냥 불투명하게 */
+@media (prefers-reduced-transparency: reduce) {
+  .topbar { background: var(--canvas); backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+
+.topbar-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--sp-sm) var(--sp-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-base);
+}
+.brand-block { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.brand {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  color: var(--ink-deep);
+  line-height: 1.25;
+  letter-spacing: var(--ls-tight);
+}
+.today-label {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-meta);
+  color: var(--steel);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 검색 — 돋보기 아이콘을 상자 안에 겹쳐 둔다 */
+.search-box { position: relative; flex: 1; max-width: 320px; display: flex; align-items: center; }
+.search-box .ico {
+  position: absolute;
+  left: 12px;
+  color: var(--stone);
+  transition: color var(--dur-ui) var(--ease-out);
+}
+.search-box:focus-within .ico { color: var(--primary); }
+.topbar-search {
+  width: 100%;
+  height: 38px;
+  padding: 0 var(--sp-md) 0 36px;
+  background: var(--surface-soft);
+  border: 1px solid transparent;
+  border-radius: var(--r-control);
+  color: var(--ink);
+  font-size: var(--fs-body-sm);
+  outline: none;
+  transition: background var(--dur-ui) var(--ease-out),
+              border-color var(--dur-ui) var(--ease-out),
+              box-shadow var(--dur-ui) var(--ease-out);
+}
+.topbar-search::placeholder { color: var(--stone); }
+.topbar-search::-webkit-search-cancel-button { display: none; }
+.topbar-search:focus {
+  background: var(--canvas);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent);
+}
+/* 비어 있을 때만 단축키를 알려준다. 치기 시작하면 사라진다. */
+.search-hint {
+  position: absolute;
+  right: 10px;
+  padding: 1px 6px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-meta);
+  color: var(--steel);
+  pointer-events: none;
+  transition: opacity var(--dur-ui) var(--ease-out);
+}
+.search-box:focus-within .search-hint { opacity: 0; }
+
+.topbar-actions { display: flex; align-items: center; gap: var(--sp-xxs); margin-left: auto; }
+
+/* 데스크톱 뷰 탭 */
+.view-tabs { display: flex; gap: 2px; padding: 3px; background: var(--surface-soft); border-radius: var(--r-control); }
+.pill {
+  padding: 6px 14px;
+  border: 1px solid transparent;
+  border-radius: var(--r-control);
+  background: transparent;
+  color: var(--steel);
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-meta);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--dur-ui) var(--ease-out),
+              color var(--dur-ui) var(--ease-out),
+              transform var(--dur-tap) var(--ease-out);
+}
+.pill:active { transform: scale(0.96); }
+.pill.is-active {
+  background: var(--canvas);
+  color: var(--ink-deep);
+  font-weight: var(--fw-semi);
+  box-shadow: var(--shadow-panel);
+}
+@media (hover: hover) and (pointer: fine) {
+  .pill:not(.is-active):hover { color: var(--ink); background: color-mix(in srgb, var(--canvas) 60%, transparent); }
+}
+
+/* 상태 거르개 (전체 목록 화면) 는 테두리형 알약을 쓴다 */
+.filter-row .pill {
+  border-color: var(--hairline);
+  background: var(--canvas);
+  color: var(--ink);
+}
+.filter-row .pill.is-active {
+  background: var(--ink-button);
+  color: var(--on-ink-button);
+  border-color: var(--ink-button);
+  box-shadow: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .filter-row .pill:not(.is-active):hover { background: var(--surface-soft); border-color: var(--stone); }
+}
+
+/* ---------- 본체 그리드 ---------- */
+.shell {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--sp-xl);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-xl);
+  align-items: start;
+}
+.col { min-width: 0; }
+
+/* 한 줄씩 늘어놓는 목록은 읽기 좋은 폭에서 멈춘다.
+   넓은 화면에서 제목 한 줄이 화면 끝까지 늘어지면 눈이 되돌아오기 힘들다. */
+.col-read { max-width: var(--read-width); }
+
+/* ---------- 사업 사이드바 (PC) ---------- */
+.sidebar { display: none; }
+
+.side-project {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  width: 100%;
+  padding: 9px var(--sp-sm);
+  border: none;
+  border-radius: var(--r-row);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--dur-ui) var(--ease-out),
+              transform var(--dur-tap) var(--ease-out);
+}
+.side-project:active { transform: scale(0.985); }
+.side-project.is-active { background: var(--surface-soft); }
+@media (hover: hover) and (pointer: fine) {
+  .side-project:not(.is-active):hover { background: color-mix(in srgb, var(--surface-soft) 60%, transparent); }
+}
+.side-dot {
+  width: 9px; height: 9px;
+  border-radius: var(--r-circle);
+  flex-shrink: 0;
+  filter: var(--proj-adjust);
+}
+.side-name {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-meta);
+  color: var(--steel);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color var(--dur-ui) var(--ease-out);
+}
+.side-project.is-active .side-name { color: var(--ink-deep); font-weight: var(--fw-semi); }
+.side-count {
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-meta);
+  color: var(--steel);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.side-count.is-danger { color: var(--critical); font-weight: var(--fw-semi); }
+
+/* ---------- 사업 칩 가로 스크롤 (모바일/태블릿) ---------- */
+.project-chips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: var(--sp-xs);
+  margin: 0 calc(var(--sp-base) * -1);
+  padding-left: var(--sp-base);
+  padding-right: var(--sp-base);
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+}
+.project-chips::-webkit-scrollbar { display: none; }
+
+.pchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-control);
+  background: var(--canvas);
+  color: var(--ink);
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-meta);
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  transition: background var(--dur-ui) var(--ease-out),
+              border-color var(--dur-ui) var(--ease-out),
+              color var(--dur-ui) var(--ease-out),
+              transform var(--dur-tap) var(--ease-out);
+}
+.pchip:active { transform: scale(0.96); }
+.pchip.is-active {
+  background: var(--ink-button);
+  color: var(--on-ink-button);
+  border-color: var(--ink-button);
+  font-weight: var(--fw-semi);
+}
+.pchip-dot { width: 8px; height: 8px; border-radius: var(--r-circle); flex-shrink: 0; filter: var(--proj-adjust); }
+.pchip-num {
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-meta);
+  padding: 1px 6px;
+  border-radius: var(--r-control);
+  background: var(--surface-soft);
+  color: var(--steel);
+  font-variant-numeric: tabular-nums;
+}
+.pchip.is-active .pchip-num {
+  background: color-mix(in srgb, var(--on-ink-button) 20%, transparent);
+  color: var(--on-ink-button);
+}
+
+/* ---------- 하단 탭바 (모바일) ---------- */
+.tabbar { display: none; }
+
+/* ---------- 섹션 ---------- */
+.section { display: flex; flex-direction: column; gap: var(--sp-md); }
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-md);
+  flex-wrap: wrap;
+}
+.section-title {
+  font-size: var(--fs-subtitle);
+  font-weight: var(--fw-bold);
+  color: var(--ink-deep);
+  letter-spacing: var(--ls-tight);
+}
+.section-note { font-size: var(--fs-caption); color: var(--steel); }
+.section-title-sm { font-size: var(--fs-body); font-weight: var(--fw-semi); color: var(--ink-deep); }
+
+/* ---------- 반응형 ---------- */
+
+/* 태블릿 이상 */
+@media (min-width: 768px) {
+  .project-chips { margin: 0; padding-left: 0; padding-right: 0; }
+}
+
+/* PC: 사이드바 등장 */
+@media (min-width: 1024px) {
+  .shell {
+    grid-template-columns: 236px minmax(0, 1fr);
+    gap: var(--sp-xxl);
+  }
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-base);
+    position: sticky;
+    top: 76px;
+    max-height: calc(100dvh - 100px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+  /* PC에서는 사업 칩 대신 사이드바를 쓴다 */
+  .project-chips { display: none; }
+}
+
+/* 모바일: 하단 탭바 */
+@media (max-width: 767px) {
+  .topbar-inner { padding: var(--sp-xs) var(--sp-base); gap: var(--sp-sm); }
+  .search-box { max-width: none; }
+  .topbar-search { height: 36px; }
+  .search-hint { display: none; }
+  .view-tabs { display: none; }         /* 하단 탭바로 대체 */
+  .shell {
+    padding: var(--sp-base);
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+
+  .tabbar {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 40;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    align-items: center;
+    background: color-mix(in srgb, var(--canvas) 92%, transparent);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-top: 1px solid var(--hairline-soft);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .tabbar { background: var(--canvas); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  }
+  .tabbar-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 54px;
+    border: none;
+    background: transparent;
+    color: var(--steel);
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-meta);
+    cursor: pointer;
+    transition: color var(--dur-ui) var(--ease-out), transform var(--dur-tap) var(--ease-out);
+  }
+  .tabbar-btn:active { transform: scale(0.94); }
+  .tabbar-btn.is-active { color: var(--ink-deep); font-weight: var(--fw-semi); }
+
+  /* 가운데 추가 버튼 — 폰에서 가장 자주 하는 일은
+     "지금 생각난 것 적어두기" 다. 스크롤해서 입력창을 찾게 하지 않는다. */
+  .tabbar-add {
+    justify-self: center;
+    width: 46px; height: 46px;
+    display: flex; align-items: center; justify-content: center;
+    border: none;
+    border-radius: var(--r-circle);
+    background: var(--ink-button);
+    color: var(--on-ink-button);
+    cursor: pointer;
+    box-shadow: var(--shadow-panel);
+    transition: transform var(--dur-tap) var(--ease-out), background var(--dur-ui) var(--ease-out);
+  }
+  .tabbar-add:active { transform: scale(0.9); }
+  .tabbar-add .ico { width: 22px; height: 22px; stroke-width: 2; }
+}
+
+/* 큰 화면에서 카드 2열 */
+@media (min-width: 1160px) {
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-base);
+    align-items: start;
+  }
+}

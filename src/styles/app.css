@@ -1,0 +1,359 @@
+/* ============================================================
+   업무보드 공통 컴포넌트
+   tokens.css 의 변수를 쓴다. 값을 직접 적지 않는다.
+
+   상태는 언제나 세 벌을 함께 만든다 — hover · active · focus-visible.
+   hover 는 반드시 (hover: hover) 안에 둔다. 터치에서는 탭이 hover 로
+   잘못 잡혀 눌렀다 뗀 자리에 색이 남는다.
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-body);
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-body);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 시트가 열려 있는 동안 뒷면이 따라 움직이지 않게 한다 */
+body.is-locked { overflow: hidden; }
+
+h1, h2, h3, h4 {
+  margin: 0;
+  font-weight: var(--fw-bold);
+  color: var(--ink-deep);
+  letter-spacing: var(--ls-tight);
+}
+h1 { font-size: var(--fs-heading-lg); line-height: var(--lh-heading); }
+h2 { font-size: var(--fs-heading-sm); line-height: var(--lh-heading); }
+h3 { font-size: var(--fs-subtitle); line-height: var(--lh-body); letter-spacing: var(--ls-body); }
+p  { margin: 0; }
+button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+code {
+  font-family: ui-monospace, SFMono-Regular, 'Cascadia Mono', Consolas, monospace;
+  font-size: 0.92em;
+  padding: 1px 5px;
+  border-radius: var(--r-sm);
+  background: var(--surface-soft);
+}
+
+/* ---------- 포커스 ----------
+   키보드로 다니는 사람에게 지금 어디 있는지 알려준다.
+   마우스로 눌렀을 때는 나오지 않는다 (:focus 가 아니라 :focus-visible). */
+:where(button, a, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.app-shell {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--sp-xl);
+}
+
+/* ---------- 아이콘 ----------
+   index.html 의 SVG 스프라이트를 <use> 로 불러 쓴다.
+   이모지는 쓰지 않는다 — 기기마다 다른 그림이 나오고 색이 튄다. */
+.ico {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.ico-sm { width: 15px; height: 15px; }
+.ico-lg { width: 20px; height: 20px; }
+/* 채워서 그리는 아이콘 (별표 켜짐 등) */
+.ico-fill { fill: currentColor; stroke: none; }
+
+/* ---------- 버튼 ----------
+   이 시스템에서 누르는 것은 언제나 알약이다. 각진 버튼은 쓰지 않는다. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-xs);
+  min-height: var(--tap-min);
+  padding: 13px 26px;
+  border: none;
+  border-radius: var(--r-control);
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-semi);
+  line-height: var(--lh-body-sm);
+  letter-spacing: var(--ls-body-sm);
+  white-space: nowrap;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background var(--dur-ui) var(--ease-out),
+              color var(--dur-ui) var(--ease-out),
+              border-color var(--dur-ui) var(--ease-out),
+              transform var(--dur-tap) var(--ease-out);
+}
+/* 눌린 순간 살짝 들어간다. 화면이 내 손을 알아들었다는 신호. */
+.btn:not(:disabled):active { transform: scale(0.97); }
+.btn-block:not(:disabled):active { transform: scale(0.99); }
+.btn:disabled { cursor: default; background: var(--surface-sunken); color: var(--disabled-text); }
+
+/* 검정 알약 — 일반 화면의 주요 동작 */
+.btn-primary { background: var(--ink-button); color: var(--on-ink-button); }
+.btn-primary:not(:disabled):active { background: var(--charcoal); }
+
+/* 코발트 알약 — 되돌리기 어려운 확정 동작에만 아껴 쓴다 */
+.btn-cta { background: var(--primary); color: var(--on-primary); }
+.btn-cta:not(:disabled):active { background: var(--primary-deep); }
+
+/* 외곽선 — 보조 동작 */
+.btn-secondary {
+  background: transparent;
+  color: var(--ink-deep);
+  border: 1.5px solid var(--ink-deep);
+  padding: 12px 25px;
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px solid var(--hairline);
+  padding: 10px 20px;
+}
+.btn-sm { min-height: 34px; padding: 7px 15px; font-size: var(--fs-caption); }
+.btn-ghost.btn-sm, .btn-secondary.btn-sm { padding: 6px 14px; }
+.btn-block { width: 100%; }
+.btn-danger { color: var(--critical); border-color: var(--overdue-line); }
+
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:not(:disabled):hover  { background: var(--charcoal); }
+  .btn-cta:not(:disabled):hover      { background: var(--primary-deep); }
+  .btn-secondary:not(:disabled):hover{ background: var(--surface-soft); }
+  .btn-ghost:not(:disabled):hover    { background: var(--surface-soft); border-color: var(--stone); }
+  .btn-danger:not(:disabled):hover   { background: var(--overdue-bg); border-color: var(--critical); }
+}
+
+/* 아이콘만 있는 둥근 버튼 */
+.icon-btn {
+  width: 38px; height: 38px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--steel);
+  border-radius: var(--r-circle);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--dur-ui) var(--ease-out),
+              color var(--dur-ui) var(--ease-out),
+              transform var(--dur-tap) var(--ease-out);
+}
+.icon-btn:active { transform: scale(0.92); }
+.icon-btn-sm { width: 30px; height: 30px; }
+.icon-btn.is-active { background: var(--surface-soft); color: var(--ink-deep); }
+@media (hover: hover) and (pointer: fine) {
+  .icon-btn:hover { background: var(--surface-soft); color: var(--ink-deep); }
+}
+
+/* ---------- 카드 ---------- */
+.card {
+  background: var(--canvas);
+  border: 1px solid var(--hairline-soft);
+  border-radius: var(--r-card);
+  padding: var(--sp-xl);
+}
+.card-lg { padding: var(--sp-xxl); }
+.card-flat { border: none; background: var(--surface-soft); }
+
+/* ---------- 입력 ---------- */
+.field { display: flex; flex-direction: column; gap: var(--sp-xs); }
+.field-label {
+  font-size: var(--fs-body-sm);
+  font-weight: var(--fw-semi);
+  color: var(--ink);
+  letter-spacing: var(--ls-body-sm);
+}
+.input {
+  min-height: var(--tap-min);
+  padding: var(--sp-md);
+  background: var(--canvas);
+  color: var(--ink);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-row);
+  outline: none;
+  transition: border-color var(--dur-ui) var(--ease-out),
+              box-shadow var(--dur-ui) var(--ease-out);
+}
+.input::placeholder { color: var(--stone); }
+/* 테두리 굵기를 바꾸면 글자가 1px 튄다. 그림자로 두껍게 보이게 한다. */
+.input:focus,
+.input:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 22%, transparent);
+}
+.input[aria-invalid="true"] { border-color: var(--critical-strong); }
+select.input { cursor: pointer; }
+textarea.input { line-height: var(--lh-body-sm); resize: vertical; }
+.field-hint  { font-size: var(--fs-caption); line-height: var(--lh-caption); color: var(--steel); }
+.field-error { font-size: var(--fs-caption); line-height: var(--lh-caption); color: var(--critical-strong); }
+
+/* 체크박스 · 라디오는 브랜드 색을 따른다 */
+input[type="checkbox"], input[type="radio"] { accent-color: var(--primary); }
+
+/* ---------- 배지 ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: var(--r-control);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-meta);
+  line-height: var(--lh-caption);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.badge-success  { background: var(--status-done-bg);     color: var(--status-done-ink); }
+.badge-wait     { background: var(--status-wait-bg);     color: var(--status-wait-ink); }
+.badge-doing    { background: var(--status-doing-bg);    color: var(--status-doing-ink); }
+.badge-urgent   { background: var(--priority-urgent-bg); color: var(--overdue-ink); }
+.badge-high     { background: var(--priority-high-bg);   color: var(--priority-high-ink); }
+.badge-normal   { background: var(--priority-normal-bg); color: var(--steel); }
+.badge-overdue  { background: var(--overdue-bg);         color: var(--overdue-ink); }
+
+/* ---------- 알림 띠 ---------- */
+.notice {
+  display: flex;
+  gap: var(--sp-md);
+  align-items: flex-start;
+  padding: var(--sp-md) var(--sp-base);
+  border-radius: var(--r-card);
+  font-size: var(--fs-body-sm);
+  line-height: var(--lh-body-sm);
+}
+.notice-info    { background: var(--status-doing-bg); color: var(--status-doing-ink); }
+.notice-success { background: var(--status-done-bg);  color: var(--status-done-ink); }
+.notice-error   { background: var(--overdue-bg);      color: var(--overdue-ink); }
+.notice-muted   { background: var(--surface-soft);    color: var(--steel); }
+
+/* ---------- 유틸 ---------- */
+.stack     { display: flex; flex-direction: column; }
+.stack-xs  { gap: var(--sp-xs); }
+.stack-md  { gap: var(--sp-md); }
+.stack-lg  { gap: var(--sp-lg); }
+.stack-xl  { gap: var(--sp-xl); }
+.row       { display: flex; align-items: center; gap: var(--sp-md); }
+.row-between { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-md); }
+.wrap      { flex-wrap: wrap; }
+.grow      { flex: 1; }
+.text-sm   { font-size: var(--fs-body-sm); line-height: var(--lh-body-sm); }
+.text-cap  { font-size: var(--fs-caption); line-height: var(--lh-caption); }
+.muted     { color: var(--steel); }
+.nums      { font-variant-numeric: tabular-nums; }
+.hidden    { display: none !important; }
+
+/* 화면에는 안 보이고 읽어주는 기계에만 들리는 글 */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* 눌러서 고르는 작은 라벨 (완료 숨김 등) */
+.toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 8px;
+  border-radius: var(--r-control);
+  font-size: var(--fs-caption);
+  color: var(--steel);
+  cursor: pointer;
+  transition: background var(--dur-ui) var(--ease-out), color var(--dur-ui) var(--ease-out);
+}
+.toggle-label input { margin: 0; width: 15px; height: 15px; cursor: pointer; }
+@media (hover: hover) and (pointer: fine) {
+  .toggle-label:hover { background: var(--surface-soft); color: var(--ink); }
+}
+
+/* ---------- 화면 중앙 배치 (로그인) ---------- */
+.center-screen {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-xl);
+}
+.center-card { width: 100%; max-width: 420px; }
+
+/* ---------- 로딩 ----------
+   빠르게 도는 표시가 실제로 더 빨리 끝나는 것처럼 느껴진다. */
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid color-mix(in srgb, currentColor 28%, transparent);
+  border-top-color: currentColor;
+  border-radius: var(--r-circle);
+  animation: spin 620ms linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* 뼈대가 살아 있는 것처럼 보이게 하는 아주 옅은 숨 */
+.skeleton {
+  background: var(--surface-soft);
+  border-radius: var(--r-sm);
+  animation: breathe 1.4s var(--ease-in-out) infinite;
+}
+@keyframes breathe { 50% { opacity: 0.55; } }
+
+/* ---------- 통계 타일 ---------- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--sp-md);
+}
+.stat {
+  background: var(--surface-soft);
+  border-radius: var(--r-card);
+  padding: var(--sp-lg);
+}
+.stat-value {
+  font-size: var(--fs-heading-sm);
+  font-weight: var(--fw-bold);
+  line-height: 1.2;
+  color: var(--ink-deep);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ls-tight);
+}
+.stat-label { font-size: var(--fs-caption); color: var(--steel); margin-top: var(--sp-xxs); }
+
+/* ---------- 모바일 ---------- */
+@media (max-width: 767px) {
+  .app-shell { padding: var(--sp-base); }
+  h1 { font-size: var(--fs-heading-sm); }
+  .card-lg { padding: var(--sp-xl); }
+  .btn { padding: 12px 22px; }
+}
+
+/* ============================================================
+   움직임을 줄여달라는 설정
+   토큰의 시간은 이미 0 이다. 여기서는 스스로 도는 것들을 세운다.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .spinner  { animation-duration: 1.6s; }
+  .skeleton { animation: none; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+  .spinner { animation-duration: 1.6s !important; animation-iteration-count: infinite !important; }
+}
