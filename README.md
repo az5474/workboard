@@ -149,7 +149,21 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\이광열\Desktop\
   1024~1279 구간에서 업무 한 줄이 화면 끝까지 늘어지던 것을 막는다.
 - 죽은 코드 정리 — `js/board.js`, 안 쓰이던 `.list-group-head`.
 
-## 배포 (GitHub Pages)
+## 배포 — 2026-08-23 완료
+
+**https://az5474.github.io/workboard/**
+
+| | |
+|---|---|
+| 저장소 | `az5474/workboard` (공개) |
+| 배포 | `.github/workflows/pages.yml` — `main` 에 push 하면 자동 |
+| 올라가는 것 | **`src/` 만.** `db/*.sql` · `serve.ps1` · `README` 는 저장소에만 있고 웹에는 없다 |
+| Supabase | Site URL · Redirect URLs 에 위 주소 등록 완료 |
+
+고치고 나서 `git push` 하면 1~2분 뒤 사이트에 반영된다. 따로 할 일은 없다.
+
+<details>
+<summary>처음 배포할 때 밟은 순서 (다시 할 일이 생기면)</summary>
 
 배포 전 점검은 2026-08-23 에 마쳤다. 아래 순서대로 하면 된다.
 
@@ -205,11 +219,21 @@ manifest 의 `start_url` · `scope` 도 `./` 다. 절대경로를 새로 넣지 
 둘 다 버전을 박아뒀다. `@2` 처럼 열어두면 그쪽 새 배포에 우리 앱이 끌려간다.
 올릴 때는 숫자를 직접 바꾸고 한 번 확인하고 올린다.
 
+</details>
+
+### 겪은 것
+
+- `gh` 로그인 토큰은 **Windows 자격 증명 관리자**에 들어간다. 어떤 PowerShell 창에서는
+  그게 안 읽혀 계속 "로그인하라"가 떴다. **`git push` 는 별개인 Git Credential Manager 를
+  쓰므로 그쪽으로 우회했다.** `gh` 가 안 잡히면 `git` 으로 밀면 된다.
+- Pages 를 켜기 전에 push 하면 워크플로가 한 번 실패한다. 정상이다.
+  Pages 를 켠 뒤 Actions 탭에서 다시 돌리면 된다.
+
 ## 남은 작업 (우선순위)
 
-1. **GitHub Pages 배포** (위 순서대로)
-2. **오프라인 대응** — 서비스워커
-3. 백업/복원 — 데스크톱 앱에는 자동백업 30개와 시점 복원이 있었다
+1. **오프라인 대응** — 서비스워커
+2. 백업/복원 — 데스크톱 앱에는 자동백업 30개와 시점 복원이 있었다
+3. 사업 순서처럼 업무도 끌어서 정렬 (`tasks.sort_order` 는 이미 있다)
 
 ---
 
