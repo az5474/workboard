@@ -218,7 +218,107 @@ export function taskRow(task, { showProject = false, flat = false, trashed = fal
   });
 
   row.appendChild(pin);
-  return row;
+
+  // 폰에서는 오른쪽으로 밀어서 완료한다. 체크박스는 그대로 있고, 길이 하나 더 생기는 것.
+  return wrapSwipe(row, task);
+}
+
+/**
+ * 오른쪽 스와이프 = 완료 (완료된 업무는 해제).
+ *
+ * 규칙 세 가지.
+ *   - 세로로 움직이기 시작하면 손을 뗀다. 스크롤을 뺏으면 목록을 못 쓴다.
+ *   - 문턱(64px)을 넘기 전에는 회색, 넘으면 초록 — 지금 놓으면 완료된다는 신호.
+ *   - 문턱 못 미치고 놓으면 스르륵 제자리로.
+ * 터치 기기에서만 건다. 마우스 드래그는 클릭과 헷갈린다.
+ */
+function wrapSwipe(row, task) {
+  if (!window.matchMedia('(pointer: coarse)').matches) return row;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'swipe';
+  const under = document.createElement('div');
+  under.className = 'swipe-under';
+  under.innerHTML = task.completed
+    ? icon('undo', 'ico') + '<span>해제</span>'
+    : icon('check', 'ico') + '<span>완료</span>';
+  wrap.append(under, row);
+
+  const THRESHOLD = 64;
+  let startX = 0, startY = 0, dx = 0;
+  let tracking = false;   // 손가락이 닿아 있다
+  let engaged = false;    // 가로 제스처로 판정됐다
+  let suppressClick = false;
+
+  row.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'touch') return;
+    startX = e.clientX; startY = e.clientY;
+    dx = 0; tracking = true; engaged = false;
+  });
+
+  row.addEventListener('pointermove', (e) => {
+    if (!tracking) return;
+    const mx = e.clientX - startX;
+    const my = e.clientY - startY;
+
+    if (!engaged) {
+      if (Math.abs(my) > 10 && Math.abs(my) > Math.abs(mx)) { tracking = false; return; }  // 스크롤이다
+      if (mx < -12) { tracking = false; return; }   // 왼쪽은 아무 일도 없다
+      if (mx < 12) return;                          // 아직 판단 전
+      engaged = true;
+      row.classList.add('is-swiping');
+      wrap.classList.add('is-swiping');
+      try { row.setPointerCapture(e.pointerId); } catch { /* 이미 떠난 포인터 */ }
+    }
+
+    dx = Math.max(0, mx);
+    // 문턱을 훌쩍 넘어가면 저항을 준다. 벽이 아니라 고무줄처럼.
+    const shown = dx <= 96 ? dx : 96 + (dx - 96) * 0.25;
+    row.style.transform = `translateX(${shown}px)`;
+    wrap.classList.toggle('is-armed', dx >= THRESHOLD);
+  });
+
+  const finish = async () => {
+    if (!tracking) return;
+    tracking = false;
+    if (!engaged) return;
+
+    suppressClick = true;
+    setTimeout(() => { suppressClick = false; }, 350);
+
+    row.classList.remove('is-swiping');
+    wrap.classList.remove('is-swiping', 'is-armed');
+
+    if (dx >= THRESHOLD) {
+      try {
+        const { undo } = await toggleComplete(task.id);
+        if (task.completed) toast('완료했습니다', { label: '되돌리기', run: undo });
+        // 상태가 바뀌면 목록이 다시 그려지므로 이 줄은 곧 사라진다
+      } catch (err) {
+        row.style.transform = '';
+        toast(err.message);
+      }
+    } else {
+      row.style.transition = 'transform var(--dur-ui) var(--ease-out)';
+      row.style.transform = '';
+      setTimeout(() => { row.style.transition = ''; }, 220);
+    }
+  };
+
+  row.addEventListener('pointerup', finish);
+  row.addEventListener('pointercancel', () => {
+    tracking = false;
+    row.classList.remove('is-swiping');
+    wrap.classList.remove('is-swiping', 'is-armed');
+    row.style.transform = '';
+  });
+
+  // 밀고 난 직후의 클릭이 상세 시트를 열어버리지 않게 잡는다
+  row.addEventListener('click', (e) => {
+    if (suppressClick) { e.stopPropagation(); e.preventDefault(); }
+  }, true);
+
+  return wrap;
 }
 
 export function escapeHtml(s) {

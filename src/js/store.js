@@ -170,7 +170,11 @@ export function projectSummary(projectId, today = todayStr()) {
 // ---------- 불러오기 ----------
 
 export async function loadAll() {
-  const [projects, tasks, trips] = await Promise.all([fetchProjects(), fetchTasks(), fetchTrips()]);
+  // 휴지통에 있는 업무도 함께 불러온다. 빼고 불러오면 새로고침한 순간
+  // 휴지통 화면이 텅 비어 보이고, 백업에도 빠진다. (liveTasks 가 화면에서 걸러준다)
+  const [projects, tasks, trips] = await Promise.all([
+    fetchProjects(), fetchTasks({ includeDeleted: true }), fetchTrips(),
+  ]);
 
   // 색은 들어오는 길목에서 한 번만 걸러둔다.
   // 화면 쪽 여덟 군데에서 각자 검사하게 두면 언젠가 한 곳을 빠뜨린다.

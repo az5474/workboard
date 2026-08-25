@@ -91,6 +91,9 @@ document.querySelectorAll('[data-view]').forEach((btn) => {
   btn.addEventListener('click', () => switchView(btn.dataset.view));
 });
 
+// views.js 가 화면을 바꾸고 싶을 때 쓰는 문. (switchView 를 직접 주면 서로 물고 돈다)
+document.addEventListener('wb:view', (e) => switchView(e.detail));
+
 // ---------- 검색 ----------
 
 // 검색어를 친다고 화면을 멋대로 바꾸지 않는다.
@@ -332,6 +335,63 @@ async function refreshStats() {
   }
 }
 $('btn-refresh').addEventListener('click', refreshStats);
+
+// ---------- 백업 ----------
+//
+// 서버가 전부지만, 서버 하나만 믿는 건 백업이 아니다.
+// 화면에 이미 있는 데이터를 그대로 파일로 내린다 (휴지통 포함 — loadAll 이 다 가져온다).
+// 복원은 upsert 라 같은 파일을 여러 번 올려도 안전하고, 파일에 없는 것은 지우지 않는다.
+
+function backupStamp() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`;
+}
+
+$('btn-backup').addEventListener('click', () => {
+  const data = {
+    app: 'workboard',
+    version: 1,
+    exported_at: new Date().toISOString(),
+    projects: state.projects,
+    tasks: state.tasks,
+    trips: state.trips,
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `업무보드-백업-${backupStamp()}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('백업 파일을 내려받았습니다');
+});
+
+$('btn-restore').addEventListener('click', () => $('file-restore').click());
+$('file-restore').addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  hide($('backup-msg'));
+  try {
+    const json = JSON.parse(await file.text());
+    if (json.app !== 'workboard' || !Array.isArray(json.projects) || !Array.isArray(json.tasks)) {
+      throw new Error('업무보드 백업 파일이 아닙니다.');
+    }
+    // 서버가 채우는 값은 빼고 올린다. 특히 user_id 를 남겨두면
+    // 다른 계정의 백업일 때 RLS 에 걸려 전부 실패한다.
+    const strip = ({ user_id, created_at, updated_at, ...rest }) => rest;
+    const p = await upsertRows('projects', json.projects.map(strip));
+    const t = await upsertRows('tasks', json.tasks.map(strip));
+    const r = Array.isArray(json.trips) && json.trips.length
+      ? await upsertRows('trips', json.trips.map(strip)) : 0;
+    await loadAll();
+    showMessage($('backup-msg'), `복원했습니다. 사업 ${p}개 · 업무 ${t}개 · 출장 ${r}개`, 'success');
+    toast('복원했습니다');
+  } catch (err) {
+    showMessage($('backup-msg'), `복원하지 못했습니다: ${err.message}`, 'error');
+  } finally {
+    e.target.value = '';
+  }
+});
 
 // ---------- 밀린 업무 정리 ----------
 

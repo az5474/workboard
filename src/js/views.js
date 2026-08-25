@@ -7,7 +7,7 @@ import {
   urgencyScore, projectSummary, togglePin, MAX_PINNED, subscribe,
   reorderProjects, moveProject, pinnedTasks, setProjectFilter,
   diffDays, addDays, parseDate, monthRange, formatMonthLabel,
-  tripsInRange, tripLength, tripColor,
+  tripsInRange, tripLength, tripColor, monthOf, setCalMonth,
 } from './store.js';
 import { $, taskRow, toast, openProjectSheet, openTripSheet, escapeHtml, icon } from './ui.js';
 import { enableSort } from './sortable.js';
@@ -79,6 +79,54 @@ function renderChips() {
     const s = projectSummary(p.id, today);
     box.appendChild(mk(p.id, p.name, p.color, s.overdue > 0 ? `${s.overdue}!` : s.open, state.projectFilter === p.id));
   });
+}
+
+// ---------- 다가오는 출장 ----------
+//
+// 출장은 결국 "그날 다른 일을 못 잡는다"는 정보다.
+// 달력을 열어야만 보이면 늦는다. 2주 안의 출장을 보드 맨 위에 한 줄로 보여준다.
+// 없으면 줄 자체가 안 나온다 — 빈 줄로 자리를 차지하지 않는다.
+
+function renderBoardTrips() {
+  const box = $('board-trips');
+  if (!box) return;
+  const today = todayStr();
+  const upcoming = tripsInRange(today, addDays(today, 14)).slice(0, 3);
+
+  box.innerHTML = '';
+  if (!upcoming.length) { box.classList.add('hidden'); return; }
+
+  const label = document.createElement('span');
+  label.className = 'board-trips-label';
+  label.textContent = '출장';
+  box.appendChild(label);
+
+  upcoming.forEach((t) => {
+    const end = t.end_date || t.start_date;
+    const ongoing = t.start_date <= today;
+    const d = diffDays(today, t.start_date);
+    const when = ongoing ? '진행 중' : `D-${d}`;
+    const dates = t.start_date === end
+      ? shortDate(t.start_date)
+      : `${shortDate(t.start_date)}~${shortDate(end)}`;
+
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btrip';
+    b.title = tripSummary(t);
+    b.innerHTML =
+      `<span class="pchip-dot" style="background:${tripColor(t)}"></span>` +
+      `<span class="btrip-d${ongoing ? ' is-now' : ''}">${when}</span>` +
+      `<span class="btrip-title">${escapeHtml(t.title)}</span>` +
+      `<span class="btrip-dates">${dates}</span>`;
+    b.addEventListener('click', () => {
+      setCalMonth(monthOf(t.start_date));
+      // 화면 전환은 main.js 가 맡는다 (switchView 가 거기 있다)
+      document.dispatchEvent(new CustomEvent('wb:view', { detail: 'calendar' }));
+    });
+    box.appendChild(b);
+  });
+  box.classList.remove('hidden');
 }
 
 // ---------- 요약 ----------
@@ -335,7 +383,25 @@ function renderProjectCards() {
   });
 
   if (!rendered) {
-    box.innerHTML = '<div class="empty">오늘로 잡힌 업무가 없습니다. 위 입력창에서 추가해 보세요.</div>';
+    const live = state.projects.filter((p) => !p.archived);
+    if (!live.length) {
+      // 처음 온 사람 (동료가 주소를 받아 막 로그인한 경우).
+      // 사업이 없으면 업무를 적을 수 없는데, 모바일에서는 사업 추가가 설정 안에
+      // 숨어 있다. 여기서 바로 만들 수 있게 길을 낸다.
+      box.innerHTML = '';
+      const d = document.createElement('div');
+      d.className = 'empty stack stack-md';
+      d.style.alignItems = 'center';
+      d.innerHTML = '<p>먼저 사업(프로젝트)을 하나 만들면 업무를 적을 수 있습니다.</p>';
+      const b = document.createElement('button');
+      b.className = 'btn btn-primary btn-sm';
+      b.textContent = '첫 사업 만들기';
+      b.addEventListener('click', () => openProjectSheet());
+      d.appendChild(b);
+      box.appendChild(d);
+    } else {
+      box.innerHTML = '<div class="empty">오늘로 잡힌 업무가 없습니다. 위 입력창에서 추가해 보세요.</div>';
+    }
   }
 }
 
@@ -666,6 +732,7 @@ export function renderAll() {
   renderChips();
 
   if (state.view === 'board') {
+    renderBoardTrips();
     renderSummary();
     renderFocus();
     renderDue();

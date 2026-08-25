@@ -122,6 +122,10 @@
 
       <!-- ---------- 보드 ---------- -->
       <main id="pane-board" class="stack stack-xl" style="margin-top:var(--sp-base)">
+        <!-- 다가오는 출장. 자리를 비우는 날은 달력을 열기 전에 보여야 한다.
+             2주 안에 출장이 없으면 이 줄은 아예 안 나온다. -->
+        <div class="board-trips hidden" id="board-trips"></div>
+
         <div class="summary-row" id="summary"></div>
 
         <div class="quick-add">
@@ -285,6 +289,23 @@
             </button>
           </div>
           <div class="summary-row" id="db-stats"></div>
+        </div>
+
+        <div class="card stack stack-lg">
+          <div class="stack stack-xs">
+            <h2>백업</h2>
+            <p class="text-sm muted">
+              사업 · 업무(휴지통 포함) · 출장 전체를 JSON 파일 하나로 저장합니다.
+              복원은 같은 계정으로 로그인한 상태에서 하며, 파일에 있는 것을 덮어쓸 뿐
+              지우지는 않습니다.
+            </p>
+          </div>
+          <div class="row wrap">
+            <button class="btn btn-primary btn-sm" id="btn-backup">백업 파일 내려받기</button>
+            <button class="btn btn-ghost btn-sm" id="btn-restore">백업에서 복원</button>
+            <input type="file" id="file-restore" accept=".json,application/json" class="hidden">
+          </div>
+          <div id="backup-msg" class="hidden"></div>
         </div>
 
         <div class="card stack stack-lg">
