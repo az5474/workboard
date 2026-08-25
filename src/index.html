@@ -129,7 +129,13 @@
           <select class="quick-project" id="quick-project" aria-label="사업 선택"></select>
           <span class="quick-sep" aria-hidden="true"></span>
           <input class="input grow" id="quick-title" type="text" placeholder="새 업무 입력 후 Enter" autocomplete="off">
-          <input class="quick-due" id="quick-due" type="date" title="마감일 (선택)" aria-label="마감일">
+          <!-- 값이 빈 date 입력은 아이폰에서 아무것도 안 그려진다.
+               보이는 라벨을 그리고, 진짜 입력은 투명하게 그 위에 얹는다. -->
+          <label class="quick-due" id="quick-due-wrap" title="마감일 (선택)">
+            <svg class="ico ico-sm"><use href="#i-calendar"></use></svg>
+            <span id="quick-due-label">마감일</span>
+            <input class="quick-due-input" id="quick-due" type="date" aria-label="마감일">
+          </label>
           <button class="btn btn-primary btn-sm" id="btn-quick-add">추가</button>
         </div>
 

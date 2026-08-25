@@ -256,6 +256,30 @@ function paintQuickDot() {
 }
 $('quick-project').addEventListener('change', paintQuickDot);
 
+// ---------- 빠른 추가의 마감일 ----------
+// 진짜 입력은 투명하게 숨어 있고, 고른 날짜를 라벨에 적어준다.
+
+function paintQuickDue() {
+  const v = $('quick-due').value;
+  const wrap = $('quick-due-wrap');
+  const label = $('quick-due-label');
+  if (v) {
+    label.textContent = `${Number(v.slice(5, 7))}.${Number(v.slice(8))} 마감`;
+    wrap.classList.add('is-set');
+  } else {
+    label.textContent = '마감일';
+    wrap.classList.remove('is-set');
+  }
+}
+$('quick-due').addEventListener('change', paintQuickDue);
+
+// 폰은 누르면 달력이 저절로 뜨지만, 데스크톱 크롬은 숨은 입력을 눌러도 안 뜬다.
+// 데스크톱에서만 직접 열어준다 (폰에서도 부르면 두 번 뜨거나 닫힌다).
+$('quick-due-wrap').addEventListener('click', () => {
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  try { $('quick-due').showPicker?.(); } catch { /* 포커스만으로 충분한 브라우저 */ }
+});
+
 // 폰에서 가장 자주 하는 일은 "지금 생각난 것 적어두기" 다
 $('tab-add').addEventListener('click', focusQuickAdd);
 
@@ -272,6 +296,7 @@ async function quickAdd() {
     await addTask({ projectId, title, dueDate: $('quick-due').value || null });
     titleEl.value = '';
     $('quick-due').value = '';     // 마감일은 매번 새로 정한다
+    paintQuickDue();
     toast('업무를 추가했습니다');
   } catch (e) {
     toast(e.message);

@@ -198,12 +198,18 @@ export async function runRollover() {
   );
   if (!targets.length) return 0;
 
-  const rows = targets.map((t) => ({
-    ...t,
-    work_date: today,
-    last_rolled_date: today,
-    carried_count: (t.carried_count || 0) + 1,
-  }));
+  const rows = targets.map((t) => {
+    // 이월 횟수는 '정말 밀렸을 때'만 올린다 — 마감일이 없거나 이미 지난 업무.
+    // 마감이 아직 남은 일은 오늘 목록으로 옮기기만 한다.
+    // 다음 주 마감인 일이 매일 "N회 이월" 배지를 다는 건 신호가 아니라 소음이다.
+    const lateOrDateless = !t.due_date || t.due_date < today;
+    return {
+      ...t,
+      work_date: today,
+      last_rolled_date: today,
+      carried_count: (t.carried_count || 0) + (lateOrDateless ? 1 : 0),
+    };
+  });
 
   await upsertRows('tasks', rows);
 
