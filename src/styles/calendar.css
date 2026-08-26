@@ -231,3 +231,10 @@
   .cal-month { font-size: var(--fs-body); min-width: 96px; }
   .cal-head-row .btn { padding: 7px 13px; }
 }
+
+/* 달력 날짜를 눌러 목록으로 건너왔을 때 잠깐 빛난다.
+   어디로 데려왔는지 눈이 따라올 수 있게. */
+.trip-row.is-flash {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 22%, transparent);
+}

@@ -13,11 +13,30 @@
 
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
 
-/* ---------- 브랜드 서체 (Cafe24, 무료 라이선스) ----------
-   본문은 그대로 Pretendard 다 — 업무 목록은 하루 종일 읽는 글자라 또렷함이 먼저다.
+/* ---------- 서체 (전부 무료 라이선스, woff2 로 동봉) ----------
+   본문 Freesentation — 사용자가 고른 본문체. Medium(500)을 400 자리까지 맡긴다.
+   화면에서는 가는 굵기보다 미디엄이 또렷하다. Pretendard 는 로드 전 대체로만 남는다.
    Ssurround(둥근 제목체)는 제목과 큰 숫자에, Syongsyong(손글씨)은 빈 화면의
    안내 문구에만 쓴다. 서체가 성격을 내는 자리와 정보를 나르는 자리를 가른다.
    swap: 폰트가 늦게 와도 글자는 먼저 보인다. */
+@font-face {
+  font-family: 'Freesentation';
+  src: url('../fonts/freesentation-500.woff2') format('woff2');
+  font-weight: 100 500;   /* 400(본문)과 500(부가정보) 둘 다 이 파일 */
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Freesentation';
+  src: url('../fonts/freesentation-600.woff2') format('woff2');
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Freesentation';
+  src: url('../fonts/freesentation-700.woff2') format('woff2');
+  font-weight: 700 900;
+  font-display: swap;
+}
 @font-face {
   font-family: 'Cafe24 Ssurround';
   src: url('../fonts/cafe24-ssurround.woff2') format('woff2');
@@ -112,8 +131,8 @@
   --proj-adjust: none;
 
   /* ---------- 서체 ---------- */
-  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
-               system-ui, 'Segoe UI', 'Malgun Gothic', sans-serif;
+  --font-sans: 'Freesentation', 'Pretendard Variable', Pretendard, -apple-system,
+               BlinkMacSystemFont, system-ui, 'Segoe UI', 'Malgun Gothic', sans-serif;
   /* 제목·큰 숫자. 본문에 쓰지 않는다 — 14px 아래로 내려가면 뭉개진다 */
   --font-display: 'Cafe24 Ssurround', var(--font-sans);
   /* 손글씨. 빈 화면의 안내 문구 전용 */

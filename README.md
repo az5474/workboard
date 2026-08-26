@@ -10,7 +10,7 @@
 호스팅   GitHub Pages (main 에 push 하면 자동 배포)
 프론트   빌드 없는 정적 앱 (HTML + ES 모듈 + CDN)
 디자인   DESIGN-meta.md (Meta 디자인 시스템) 기반 · 2026-08-23 고도화
-서체     본문 Pretendard · 제목 Cafe24 Ssurround · 빈 화면 안내 Cafe24 Syongsyong
+서체     본문 Freesentation(500·600·700) · 제목 Cafe24 Ssurround · 빈 화면 안내 Cafe24 Syongsyong
 ```
 
 **동료와 같이 쓰기** — 주소만 알려주면 된다. 각자 자기 이메일로 로그인하고,
@@ -171,7 +171,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\이광열\Desktop\
 
 ### 서체 (2026-08-26)
 
-- **본문은 Pretendard 그대로.** 업무 목록은 하루 종일 읽는 글자라 또렷함이 먼저다.
+- **본문 Freesentation** — Medium(500)이 400 자리까지 맡는다. 화면에서는 가는
+  굵기보다 미디엄이 또렷하다. SemiBold(600)·Bold(700)까지 세 굵기.
+  Pretendard 는 폰트가 로드되기 전 잠깐의 대체로만 남는다.
 - **Cafe24 Ssurround** (둥근 제목체) — 브랜드·제목·큰 숫자. `--font-display`.
 - **Cafe24 Syongsyong** (손글씨) — 빈 화면의 안내 문구 전용. `--font-hand`.
   일하는 글자와 말 거는 글자를 서체로 가른다.
@@ -180,6 +182,18 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\이광열\Desktop\
 - **버튼은 어디에 놓여도 본문체다** (`.btn` 에 font-family 명시). 손글씨 안내문
   안의 버튼이 손글씨가 되는 사고를 막는다.
 - 한 굵기짜리 서체라 `font-synthesis: none` 으로 가짜 볼드를 막았다.
+
+### 모바일 편의 (2026-08-26 2차)
+
+- **달력 날짜 탭 (폰)** — 출장이 있는 날을 누르면 시트가 열리는 대신 아래 목록의
+  그 출장으로 스크롤하고 잠깐 강조한다. 폰에서 날짜를 누르는 건 대개 "이게 뭐지"
+  이지 "추가하자" 가 아니다. 빈 날은 그대로 새 출장. PC 는 기존대로.
+- **당겨서 새로고침 차단** — 맨 위에서 휙 당기면 안드로이드가 페이지를 통째로
+  다시 읽어버린다. 앱은 창에 돌아올 때마다 알아서 동기화하므로 막았다
+  (`overscroll-behavior-y: contain`).
+- **홈 화면 아이콘** — 아이폰은 매니페스트의 SVG 를 무시하고 `apple-touch-icon`
+  PNG 만 본다. 없으면 스크린샷이 아이콘이 됐다. `icon-180.png`(아이폰)와
+  `icon-512.png`(안드로이드 매니페스트)를 추가했다.
 
 ### 모바일 실기기 수정 (2026-08-26)
 

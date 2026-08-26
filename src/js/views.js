@@ -495,7 +495,24 @@ function calendarWeek(weekStart, trips, ym, today) {
     cell.innerHTML = `<span class="cal-num">${Number(date.slice(8))}</span>`;
     cell.title = `${date} 에 출장 추가`;
     cell.setAttribute('aria-label', `${date} 에 출장 추가`);
-    cell.addEventListener('click', () => openTripSheet(null, { startDate: date }));
+    cell.addEventListener('click', () => {
+      // 폰에서 출장 있는 날을 누르는 건 대개 "이게 뭐지" 지 "추가하자" 가 아니다.
+      // 아래 목록의 그 출장으로 데려가 잠깐 빛나게 한다. 빈 날은 그대로 추가.
+      if (window.matchMedia('(pointer: coarse)').matches) {
+        const dayTrips = tripsInRange(date, date);
+        if (dayTrips.length) {
+          const target = document.querySelector(`.trip-row[data-id="${CSS.escape(dayTrips[0].id)}"]`);
+          if (target) {
+            const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            target.scrollIntoView({ block: 'center', behavior: still ? 'auto' : 'smooth' });
+            target.classList.add('is-flash');
+            setTimeout(() => target.classList.remove('is-flash'), 1400);
+            return;
+          }
+        }
+      }
+      openTripSheet(null, { startDate: date });
+    });
     days.appendChild(cell);
   }
   week.appendChild(days);
@@ -570,6 +587,7 @@ function renderTripList(ym, today) {
     const row = document.createElement('button');
     row.type = 'button';
     row.className = 'trip-row' + (end < today ? ' is-past' : '');
+    row.dataset.id = t.id;   // 달력 날짜를 누르면 여기로 데려온다
 
     const meta = [
       t.start_date === end

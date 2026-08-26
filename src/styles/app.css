@@ -12,6 +12,9 @@
 html, body {
   margin: 0;
   padding: 0;
+  /* 맨 위에서 휙 당기면 안드로이드가 페이지를 통째로 새로고침해 버린다.
+     앱은 창에 돌아올 때마다 알아서 다시 읽으므로, 실수로 리셋되는 길만 막는다. */
+  overscroll-behavior-y: contain;
   background: var(--canvas);
   color: var(--ink);
   font-family: var(--font-sans);
