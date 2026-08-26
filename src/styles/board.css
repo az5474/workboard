@@ -256,6 +256,10 @@
 .swipe-under {
   position: absolute;
   inset: 0;
+  /* 절대배치는 일반 배치 위에 그려진다. 이 판은 순전히 배경 그림이라
+     손가락을 받으면 안 된다 — 안 그러면 투명한 판이 행 전체의 탭을 삼켜
+     상세·체크·별표가 전부 죽는다 (실제로 그랬다). */
+  pointer-events: none;
   display: flex;
   align-items: center;
   gap: 6px;
