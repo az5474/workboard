@@ -17,12 +17,13 @@
 }
 .sum { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
 .sum-value {
+  font-family: var(--font-display);
+  font-synthesis: none;
   font-size: var(--fs-subtitle);
   font-weight: var(--fw-bold);
   line-height: 1.1;
   color: var(--ink-deep);
   font-variant-numeric: tabular-nums;
-  letter-spacing: var(--ls-tight);
 }
 .sum-label { font-size: var(--fs-caption); color: var(--steel); white-space: nowrap; }
 .sum.is-danger .sum-value { color: var(--critical); }
@@ -190,7 +191,8 @@
   padding: var(--sp-base);
   text-align: center;
   color: var(--steel);
-  font-size: var(--fs-body-sm);
+  font-family: var(--font-hand);
+  font-size: var(--fs-body);
 }
 
 /* ---------- 다가오는 출장 (보드 맨 위) ----------
@@ -244,7 +246,13 @@
 /* ---------- 스와이프 완료 (터치 기기) ----------
    업무를 오른쪽으로 밀면 아래에서 완료 판이 드러난다.
    문턱(64px)을 넘기 전에는 회색, 넘으면 초록 — 지금 놓으면 된다는 신호. */
-.swipe { position: relative; }
+.swipe {
+  position: relative;
+  /* 길게 누르면 아이폰이 돋보기·글자 선택으로 제스처를 가로챈다 */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
 .swipe-under {
   position: absolute;
   inset: 0;
@@ -270,8 +278,9 @@
 
 /* ---------- 업무 행 ---------- */
 .task {
-  /* 세로 스크롤은 브라우저가, 가로 제스처는 우리가 받는다 */
-  touch-action: pan-y pinch-zoom;
+  /* 세로 스크롤은 브라우저가, 가로 제스처는 우리가 받는다.
+     pinch-zoom 키워드를 붙이면 사파리가 선언 전체를 버려서 스와이프가 죽는다. */
+  touch-action: pan-y;
   display: flex;
   align-items: flex-start;
   gap: var(--sp-md);
@@ -436,6 +445,7 @@
 .fslot::before {
   counter-increment: slot;
   content: counter(slot);
+  font-family: var(--font-display);
   font-size: var(--fs-body-sm);
   font-weight: var(--fw-bold);
   font-variant-numeric: tabular-nums;
@@ -465,7 +475,8 @@
   background: transparent;
   color: var(--steel);
   font-family: inherit;
-  font-size: var(--fs-body-sm);
+  font-family: var(--font-hand);
+  font-size: var(--fs-body);
   text-align: left;
   cursor: pointer;
   transition: border-color var(--dur-ui) var(--ease-out),
@@ -497,11 +508,13 @@
 .focus-elsewhere .pchip { font-size: var(--fs-caption); padding: 5px 11px; }
 
 /* ---------- 빈 상태 ---------- */
+/* 빈 화면의 안내는 손글씨로. 일하는 글자(업무·숫자)와 말 거는 글자를 서체로 가른다. */
 .empty {
   padding: var(--sp-xl) var(--sp-lg);
   text-align: center;
   color: var(--steel);
-  font-size: var(--fs-body-sm);
+  font-family: var(--font-hand);
+  font-size: var(--fs-subtitle);
   line-height: var(--lh-body-sm);
   background: var(--surface-soft);
   border-radius: var(--r-card);
@@ -682,6 +695,10 @@
 .sortrow {
   display: flex;
   align-items: center;
+  /* 끌다가 아이폰 돋보기·글자 선택이 끼어들지 않게 */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   gap: var(--sp-sm);
   padding: var(--sp-xs) var(--sp-sm);
   background: var(--canvas);
@@ -776,6 +793,8 @@ kbd {
      제목이 윗줄을 통째로 쓰고, 아랫줄에 사업·마감일·추가 버튼이 나란히 선다.
      세 줄이 되면 입력창 하나가 화면의 5분의 1을 먹는다. */
   .quick-add { flex-wrap: wrap; border-radius: var(--r-card); padding: var(--sp-xs) var(--sp-sm); }
+  /* 아이폰 확대 방지: 입력·선택은 16px 이상 */
+  .quick-project, .quick-due-input { font-size: 16px; }
   .quick-add .grow { flex: 1 1 100%; order: -1; }
   .quick-project { max-width: none; flex: 1 1 32%; min-width: 88px; }
   .quick-due { flex: 0 1 auto; font-size: var(--fs-caption); }

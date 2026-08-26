@@ -10,6 +10,7 @@
 호스팅   GitHub Pages (main 에 push 하면 자동 배포)
 프론트   빌드 없는 정적 앱 (HTML + ES 모듈 + CDN)
 디자인   DESIGN-meta.md (Meta 디자인 시스템) 기반 · 2026-08-23 고도화
+서체     본문 Pretendard · 제목 Cafe24 Ssurround · 빈 화면 안내 Cafe24 Syongsyong
 ```
 
 **동료와 같이 쓰기** — 주소만 알려주면 된다. 각자 자기 이메일로 로그인하고,
@@ -167,6 +168,32 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\이광열\Desktop\
 - **레이아웃** — 카드 2열을 1280px → 1160px 로 당기고, 한 줄 목록에 읽기 폭을 걸었다.
   1024~1279 구간에서 업무 한 줄이 화면 끝까지 늘어지던 것을 막는다.
 - 죽은 코드 정리 — `js/board.js`, 안 쓰이던 `.list-group-head`.
+
+### 서체 (2026-08-26)
+
+- **본문은 Pretendard 그대로.** 업무 목록은 하루 종일 읽는 글자라 또렷함이 먼저다.
+- **Cafe24 Ssurround** (둥근 제목체) — 브랜드·제목·큰 숫자. `--font-display`.
+- **Cafe24 Syongsyong** (손글씨) — 빈 화면의 안내 문구 전용. `--font-hand`.
+  일하는 글자와 말 거는 글자를 서체로 가른다.
+- 파일은 `src/fonts/*.woff2` (OTF 를 woff2 로 압축, 합쳐 1.8MB). Cafe24 폰트는
+  상업 사용·재배포가 허용된 무료 라이선스다.
+- **버튼은 어디에 놓여도 본문체다** (`.btn` 에 font-family 명시). 손글씨 안내문
+  안의 버튼이 손글씨가 되는 사고를 막는다.
+- 한 굵기짜리 서체라 `font-synthesis: none` 으로 가짜 볼드를 막았다.
+
+### 모바일 실기기 수정 (2026-08-26)
+
+- **아이폰 자동 확대** — iOS 는 글자가 16px 미만인 입력칸을 누르면 화면 전체를
+  확대해 버리고, 저절로 안 돌아온다. 검색창(14px)·사업 선택(14px)이 원인이었다.
+  입력·선택·textarea 는 모바일에서 무조건 16px 이상 (`app.css` 안전망 +
+  개별 클래스 수정).
+- **스와이프가 실기기에서 죽던 것** — `touch-action: pan-y pinch-zoom` 에서
+  사파리가 모르는 `pinch-zoom` 키워드 때문에 선언 전체를 버려 제스처가 브라우저로
+  넘어갔다. `pan-y` 만 남겼다.
+- **길게 누르면 iOS 돋보기·글자 선택이 드래그를 가로채던 것** — 스와이프 줄과
+  사업 순서 줄에 `user-select: none` + `-webkit-touch-callout: none`.
+- **밝기 버튼을 설정으로** — 375px 상단바에서 검색이 눌리고 있었다. 모바일에서는
+  상단바에서 숨기고 설정의 "화면 밝기" 카드로. PC 상단바에는 그대로 있다.
 
 ## 배포 — 2026-08-23 완료
 

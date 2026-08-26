@@ -122,18 +122,25 @@ function applyTheme(theme) {
   else document.documentElement.setAttribute('data-theme', theme);
   localStorage.setItem(THEME_KEY, theme);
 
-  const ico = $('theme-icon');
-  if (ico) ico.setAttribute('href', THEME_ICON[theme] || THEME_ICON.auto);
-  const btn = $('btn-theme');
-  if (btn) btn.title = `화면 밝기: ${THEME_LABEL[theme]}`;
+  // 상단바 버튼(PC)과 설정 카드(모바일)가 같은 상태를 보여준다
+  [['theme-icon', 'btn-theme'], ['theme-icon-2', 'btn-theme-2']].forEach(([icoId, btnId]) => {
+    const ico = $(icoId);
+    if (ico) ico.setAttribute('href', THEME_ICON[theme] || THEME_ICON.auto);
+    const btn = $(btnId);
+    if (btn) btn.title = `화면 밝기: ${THEME_LABEL[theme]}`;
+  });
+  const desc = $('theme-desc');
+  if (desc) desc.textContent = THEME_LABEL[theme] + (theme === 'auto' ? '' : ' 고정');
 }
 
-$('btn-theme').addEventListener('click', () => {
+function cycleTheme() {
   const now = localStorage.getItem(THEME_KEY) || 'auto';
   const next = now === 'auto' ? 'light' : now === 'light' ? 'dark' : 'auto';
   applyTheme(next);
   toast(THEME_LABEL[next]);
-});
+}
+$('btn-theme').addEventListener('click', cycleTheme);
+$('btn-theme-2').addEventListener('click', cycleTheme);
 applyTheme(localStorage.getItem(THEME_KEY) || 'auto');
 
 // ---------- 키보드 ----------

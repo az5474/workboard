@@ -264,7 +264,8 @@ function wrapSwipe(row, task) {
     if (!engaged) {
       if (Math.abs(my) > 10 && Math.abs(my) > Math.abs(mx)) { tracking = false; return; }  // 스크롤이다
       if (mx < -12) { tracking = false; return; }   // 왼쪽은 아무 일도 없다
-      if (mx < 12) return;                          // 아직 판단 전
+      // 실기기의 손가락은 흔들린다. 가로가 세로보다 확실히 클 때만 제스처로 본다.
+      if (mx < 14 || mx < Math.abs(my) * 1.2) return;
       engaged = true;
       row.classList.add('is-swiping');
       wrap.classList.add('is-swiping');

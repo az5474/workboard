@@ -28,13 +28,15 @@ body.is-locked { overflow: hidden; }
 
 h1, h2, h3, h4 {
   margin: 0;
+  font-family: var(--font-display);
   font-weight: var(--fw-bold);
+  font-synthesis: none;          /* 한 굵기짜리 서체에 가짜 볼드를 씌우지 않는다 */
   color: var(--ink-deep);
-  letter-spacing: var(--ls-tight);
+  letter-spacing: 0;             /* 둥근 제목체는 제 간격이 이미 넉넉하다 */
 }
 h1 { font-size: var(--fs-heading-lg); line-height: var(--lh-heading); }
 h2 { font-size: var(--fs-heading-sm); line-height: var(--lh-heading); }
-h3 { font-size: var(--fs-subtitle); line-height: var(--lh-body); letter-spacing: var(--ls-body); }
+h3 { font-size: var(--fs-subtitle); line-height: var(--lh-body); }
 p  { margin: 0; }
 button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 code {
@@ -87,6 +89,8 @@ code {
   gap: var(--sp-xs);
   min-height: var(--tap-min);
   padding: 13px 26px;
+  /* 버튼은 어디에 놓여도 본문체다. 손글씨 안내문 안에 들어가도 상속받지 않는다. */
+  font-family: var(--font-sans);
   border: none;
   border-radius: var(--r-control);
   font-size: var(--fs-body-sm);
@@ -326,6 +330,8 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--primary); }
   padding: var(--sp-lg);
 }
 .stat-value {
+  font-family: var(--font-display);
+  font-synthesis: none;
   font-size: var(--fs-heading-sm);
   font-weight: var(--fw-bold);
   line-height: 1.2;
@@ -341,6 +347,11 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--primary); }
   h1 { font-size: var(--fs-heading-sm); }
   .card-lg { padding: var(--sp-xl); }
   .btn { padding: 12px 22px; }
+
+  /* 아이폰은 16px 미만 입력칸을 누르면 화면 전체를 확대해 버린다.
+     확대는 저절로 안 돌아와서 화면이 계속 깨져 보인다.
+     여기는 안전망 — 개별 클래스가 더 작게 정한 곳은 각자 파일에서 고친다. */
+  input, select, textarea { font-size: max(1em, 16px); }
 }
 
 /* ============================================================

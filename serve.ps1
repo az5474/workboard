@@ -32,6 +32,7 @@ $mime = @{
     '.jpg'  = 'image/jpeg'
     '.ico'  = 'image/x-icon'
     '.webmanifest' = 'application/manifest+json'
+    '.woff2' = 'font/woff2'
 }
 
 $listener = New-Object System.Net.HttpListener

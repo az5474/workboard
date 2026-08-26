@@ -31,7 +31,9 @@
 }
 .brand-block { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 .brand {
-  font-size: var(--fs-body);
+  font-family: var(--font-display);
+  font-synthesis: none;
+  font-size: var(--fs-subtitle);
   font-weight: var(--fw-bold);
   color: var(--ink-deep);
   line-height: 1.25;
@@ -269,13 +271,14 @@
   flex-wrap: wrap;
 }
 .section-title {
+  font-family: var(--font-display);
+  font-synthesis: none;
   font-size: var(--fs-subtitle);
   font-weight: var(--fw-bold);
   color: var(--ink-deep);
-  letter-spacing: var(--ls-tight);
 }
 .section-note { font-size: var(--fs-caption); color: var(--steel); }
-.section-title-sm { font-size: var(--fs-body); font-weight: var(--fw-semi); color: var(--ink-deep); }
+.section-title-sm { font-family: var(--font-display); font-synthesis: none; font-size: var(--fs-body); color: var(--ink-deep); }
 
 /* ---------- 반응형 ---------- */
 
@@ -309,6 +312,11 @@
   .topbar-inner { padding: var(--sp-xs) var(--sp-base); gap: var(--sp-sm); }
   .search-box { max-width: none; }
   .topbar-search { height: 36px; }
+  /* 아이폰은 16px 미만 입력칸을 누르면 화면 전체를 확대해 버린다.
+     입력에 들어가는 글자는 무조건 16px 이상으로. */
+  .topbar-search { font-size: 16px; }
+  /* 밝기 전환은 설정으로 옮겼다. 상단바가 좁아 검색이 눌리고 있었다. */
+  #btn-theme { display: none; }
   .search-hint { display: none; }
   .view-tabs { display: none; }         /* 하단 탭바로 대체 */
   .shell {
