@@ -1,7 +1,10 @@
-# 업무보드 (workboard)
+# 업무보드 (workboard) v1.0
 
 여러 사업의 오늘 할 일을 한자리에서 보는 웹앱.
 기존 Electron 데스크톱 앱(v2.9)을 **PC·노트북·모바일 어디서나** 쓸 수 있게 웹으로 옮겼다.
+
+**v1.0 (2026-08-26)** — 배포·팀 사용까지 마친 정식판. 보드·전체 목록·출장 달력·
+휴지통·설정, 핵심 3(사업별), 이월 자동화, 백업/복원, 밝게·어둡게, 모바일 스와이프.
 
 **쓰는 곳: https://az5474.github.io/workboard/**
 
@@ -48,6 +51,29 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\이광열\Desktop\
 - **secret key 는 절대 코드에 넣지 않는다.** RLS 를 무시하고 DB 전체가 열린다.
 - 스키마: `db/01_schema.sql` (실행 완료). 테이블 `projects` · `tasks` · `trips`, 전부 RLS 적용.
 - 로그인: 이메일 매직링크. 비밀번호 없음.
+
+### 로그인 메일은 커스텀 SMTP 로 나간다 (2026-08-26)
+
+**Supabase 기본 메일은 시간당 2통이 한계다.** 공식 문서가 "운영용이 아니다"라고
+못 박고 있다. 혼자 쓸 땐 안 드러나다가 **팀원이 들어오는 순간 터진다** —
+실제로 팀원이 `email rate limit exceeded` 를 맞고서야 알았다.
+
+그래서 지메일 SMTP 를 연결했다. 설정 자리는
+`Authentication > SMTP` (`/auth/smtp`. 예전 `/settings/auth` 가 아니다).
+
+| 칸 | 값 |
+|---|---|
+| Host | `smtp.gmail.com` |
+| Port | `587` |
+| Username · Sender email | `az5474@gmail.com` |
+| Password | 지메일 **앱 비밀번호** (2단계 인증 필요) |
+
+- 하루 500통. Supabase 쪽 시간당 한도는 `/auth/rate-limits` 에서 조정한다.
+- **"personal rather than transactional" 경고는 무시해도 된다.** 오류가 아니다.
+  다만 받는 쪽에서 스팸으로 갈 수 있으니, 새 팀원에게는
+  "`az5474@gmail.com` 에서 오고, 안 보이면 스팸함 확인" 이라고 미리 알려준다.
+- 이 설정을 바꿔도 **기존 사용자는 영향이 없다.** 로그인 상태·데이터 그대로,
+  배달 경로만 바뀐다. 회사 도메인 메일이 생기면 그때 갈아타면 된다.
 
 ---
 
