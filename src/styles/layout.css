@@ -243,6 +243,17 @@
   border-color: var(--ink-button);
   font-weight: var(--fw-semi);
 }
+/* 줄 끝의 사업 추가. 사업을 고르는 칩이 아니라 만드는 버튼이라
+   점선으로 구분한다 — 옆의 진짜 사업들과 헷갈리지 않게. */
+.pchip-add {
+  border-style: dashed;
+  color: var(--steel);
+  padding-left: 11px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .pchip-add:hover { border-style: solid; border-color: var(--stone); color: var(--ink); background: var(--surface-soft); }
+}
+
 .pchip-dot { width: 8px; height: 8px; border-radius: var(--r-circle); flex-shrink: 0; filter: var(--proj-adjust); }
 .pchip-num {
   font-size: var(--fs-micro);

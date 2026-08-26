@@ -79,6 +79,19 @@ function renderChips() {
     const s = projectSummary(p.id, today);
     box.appendChild(mk(p.id, p.name, p.color, s.overdue > 0 ? `${s.overdue}!` : s.open, state.projectFilter === p.id));
   });
+
+  // 줄 끝의 사업 추가.
+  // PC 는 사이드바 머리에 ＋ 가 있지만 폰에는 그 사이드바가 없어서,
+  // 설정까지 들어가야만 사업을 만들 수 있었다. 사업 목록이 이미 여기 있으니
+  // 만드는 것도 여기서 된다.
+  const add = document.createElement('button');
+  add.type = 'button';
+  add.className = 'pchip pchip-add';
+  add.title = '사업 추가';
+  add.setAttribute('aria-label', '사업 추가');
+  add.innerHTML = icon('plus', 'ico ico-sm') + '<span>사업</span>';
+  add.addEventListener('click', () => openProjectSheet());
+  box.appendChild(add);
 }
 
 // ---------- 다가오는 출장 ----------
